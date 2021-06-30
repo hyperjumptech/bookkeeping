@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/IDN-Media/awards/internal/config"
 	"github.com/IDN-Media/awards/internal/health"
 	"github.com/IDN-Media/awards/internal/logger"
 	"github.com/gorilla/mux"
@@ -31,15 +32,18 @@ func InitRoutes(router *Router) {
 
 	// register middlewares
 	// r.Use(apmgorilla.Middleware()) // apmgorilla.Instrument(r.MuxRouter) // elastic apm
-	r.Use(logger.MyLogger) // ye-olde logger
+	r.Use(logger.Logger) // your faithfull logger
 
 	// health check endpoint. Not in a version path as it will seems to be a permanent endpoint (famous last words)
 	r.HandleFunc("/health", health.Health).Methods("GET")
 
-	walk(*r)
+	// display routes under development
+	if config.Get("app.env") == "development" {
+		walk(*r)
+	}
 }
 
-// walk runs the mux.Router.Walk method to print all the registerd routes
+// walk runs the mux.Router.Walk method to print all the registered routes
 func walk(r mux.Router) {
 	err := r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
 		pathTemplate, err := route.GetPathTemplate()

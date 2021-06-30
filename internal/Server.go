@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/IDN-Media/awards/internal/config"
+	"github.com/IDN-Media/awards/internal/logger"
 	"github.com/IDN-Media/awards/internal/router"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -28,7 +29,7 @@ var (
 
 	// AppRouter object
 	appRouter *router.Router
-	// AppHandlers is all the handlera
+	// AppHandlers is all the handlers
 	// appHandlers *handlers.Handlers
 	// Address of server
 	address string
@@ -42,6 +43,9 @@ func InitializeServer() error {
 	logf := srvLog.WithField("fn", "InitializeServer")
 
 	startUpTime = time.Now()
+
+	config.LoadConfig()
+	logger.ConfigureLogging() // configure logging
 
 	logf.Info("setting up routing...")
 	appRouter = router.NewRouter()

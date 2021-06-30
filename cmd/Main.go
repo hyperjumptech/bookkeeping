@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	splashScreen = `
+	splashScreen = ` 
     __ ___      ____ _ _ __ __| |___ 
    / _  \ \ /\ / / _  |  __/ _  / __|
   | (_| |\ V  V / (_| | | | (_| \__ \
    \__,_| \_/\_/ \__,_|_|  \__,_|___/
-									 
+ 				 
 
 	(c)2021 idn-media awards server
 	https://github.com/idn-media/awards/README.md  
@@ -24,7 +24,6 @@ var (
 func init() {
 	fmt.Println(splashScreen)
 	log.Info("initialzing...")
-	log.SetFormatter(&log.JSONFormatter{})
 }
 
 // Main entry point
