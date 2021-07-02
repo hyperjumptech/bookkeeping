@@ -31,7 +31,7 @@ test-coverage: test
 	go tool cover -html=coverage.out
 
 docker:
-	docker build -t $(IMAGE_NAME) -f .docker/Dockerfile .
+	docker build -t $(IMAGE_NAME) -f ./.docker/Dockerfile .
 
 docker-run:
 	docker run -p 7000:7000 -d $(IMAGE_NAME)
