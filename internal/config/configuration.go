@@ -27,7 +27,7 @@ func LoadConfig() {
 	defCfg["app.env"] = "development" // set to production
 
 	defCfg["server.host"] = "localhost"
-	defCfg["server.port"] = "7000"
+	defCfg["server.port"] = "50051"
 	defCfg["server.log.level"] = "debug" // valid values are trace, debug, info, warn, error, fatal
 	defCfg["server.timeout.write"] = "15 seconds"
 	defCfg["server.timeout.read"] = "15 seconds"
