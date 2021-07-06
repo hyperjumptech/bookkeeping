@@ -246,7 +246,7 @@ tags
 
 ### VisualStudioCode ###
 .vscode/*
-!.vscode/settings.json
+.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
@@ -285,8 +285,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# End of https://www.toptal.com/developers/gitignore/api/go,linux,macos,windows,visualstudiocode,vim,emacs,intellij+all,git
 
 ### ignore images
 awards-go-img

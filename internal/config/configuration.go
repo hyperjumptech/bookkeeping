@@ -34,6 +34,9 @@ func LoadConfig() {
 	defCfg["server.timeout.idle"] = "60 seconds"
 	defCfg["server.timeout.graceshut"] = "15 seconds"
 
+	defCfg["health.local"] = "http://localhost:8080"
+	defCfg["health.sql.con"] = ""
+
 	defCfg["jwt.accessKey"] = "sample_key"
 	defCfg["jwt.refreshKey"] = "sample_key"
 

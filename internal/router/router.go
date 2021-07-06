@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	healthhttp "github.com/AppsFlyer/go-sundheit/http"
 	"github.com/IDN-Media/awards/internal/config"
 	"github.com/IDN-Media/awards/internal/health"
 	"github.com/IDN-Media/awards/internal/logger"
@@ -31,11 +32,11 @@ func InitRoutes(router *Router) {
 	r := router.Router
 
 	// register middlewares
-	// r.Use(apmgorilla.Middleware()) // apmgorilla.Instrument(r.MuxRouter) // elastic apm
+	// r.Use(apmgorilla.Middleware()) // apmgorilla.Instrument(r.MuxRouter) // elastic apm: DISABLED
 	r.Use(logger.Logger) // your faithfull logger
 
 	// health check endpoint. Not in a version path as it will seems to be a permanent endpoint (famous last words)
-	r.HandleFunc("/health", health.Health).Methods("GET")
+	r.HandleFunc("/health", healthhttp.HandleHealthJSON(health.H)).Methods("GET")
 
 	// display routes under development
 	if config.Get("app.env") == "development" {

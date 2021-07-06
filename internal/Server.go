@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/IDN-Media/awards/internal/config"
+	"github.com/IDN-Media/awards/internal/health"
 	"github.com/IDN-Media/awards/internal/logger"
 	"github.com/IDN-Media/awards/internal/router"
 	"github.com/gorilla/mux"
@@ -29,10 +30,10 @@ var (
 
 	// AppRouter object
 	appRouter *router.Router
-	// AppHandlers is all the handlers
-	// appHandlers *handlers.Handlers
+
 	// Address of server
 	address string
+
 	// Repo is the database object
 	// sqxRepo *connector.DbPool
 
@@ -41,18 +42,20 @@ var (
 // InitializeServer initializes all server connections
 func InitializeServer() error {
 	logf := srvLog.WithField("fn", "InitializeServer")
+	logger.ConfigureLogging() // configure logging
 
 	startUpTime = time.Now()
 
 	config.LoadConfig()
-	logger.ConfigureLogging() // configure logging
 
 	logf.Info("setting up routing...")
 	appRouter = router.NewRouter()
 	appRouter.Router = mux.NewRouter()
 
-	// appHandlers = handlers.NewHandlers(repo)
-	// appRouter.Handlers = appHandlers
+	err := health.InitializeHealthCheck()
+	if err != nil {
+		logf.Warn("health monitor error: ", err)
+	}
 
 	logf.Info("initializing routes...")
 	router.InitRoutes(appRouter)

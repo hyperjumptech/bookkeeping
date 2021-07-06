@@ -14,6 +14,7 @@ import (
 type ContextKey string
 
 const (
+	// ContextKeyRequestID is the contextKey key name (string)
 	ContextKeyRequestID ContextKey = "requestID"
 )
 
