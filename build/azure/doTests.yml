@@ -1,0 +1,45 @@
+#####################################################################
+# Azure pipeline : build dependency, unit test and publish
+# 
+# (c)2020 IDNMedia
+#################################################################### 
+parameters:
+  - name: testPath
+    type: string
+    default: './...'
+
+steps:
+    - script: |
+        set -ex      
+        go version
+        go get github.com/jstemmer/go-junit-report
+        go get github.com/axw/gocov/gocov
+        go get github.com/AlekSi/gocov-xml
+        go get golang.org/x/lint/golint
+        go get github.com/t-yuki/gocover-cobertura
+        go install github.com/newm4n/goornogo
+        sudo timedatectl set-timezone Asia/Jakarta
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+      displayName: 'Fetch dependencies'
+
+    - script: |
+            set -ex
+            /home/vsts/go/bin/golint -set_exit_status ${{ parameters.testPath }}
+            go test ./... -cover -vet -all -v -short -covermode=count -coverprofile=coverage.out > test_results.txt
+            /home/vsts/go/bin/go-junit-report < test_results.txt > report.xml
+            /home/vsts/go/bin/gocover-cobertura < coverage.out > coverage.xml
+            /home/vsts/go/bin/goornogo -c 30 -i coverage.out
+      workingDirectory: '$(System.DefaultWorkingDirectory)'
+      displayName: 'Run unit test'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish unit test results'
+      inputs:
+        testRunner: JUnit
+        testResultsFiles: $(System.DefaultWorkingDirectory)/**/report.xml
+
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish coverage'
+      inputs:
+        codeCoverageTool: 'Cobertura'
+        summaryFileLocation: 'coverage.xml'

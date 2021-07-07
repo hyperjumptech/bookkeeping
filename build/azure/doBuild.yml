@@ -1,0 +1,19 @@
+#####################################################
+# azure build step (template)
+# (c)2021 IDNMedia
+#####################################################
+parameters:
+  - name: imageName
+    type: string
+    default: 'idn-media-img'
+  - name: path
+    type: string
+    default: './...'
+
+steps:
+    - task: Go@0
+      displayName: 'Build image'
+      inputs:
+        command: 'build'
+        arguments: '-v -o ${{ parameters.imageName }} ${{ parameters.path }}'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
