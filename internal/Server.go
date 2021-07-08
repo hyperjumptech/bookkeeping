@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/IDN-Media/awards/internal/config"
+	"github.com/IDN-Media/awards/internal/connector"
 	"github.com/IDN-Media/awards/internal/health"
 	"github.com/IDN-Media/awards/internal/logger"
 	"github.com/IDN-Media/awards/internal/router"
@@ -33,29 +34,25 @@ var (
 
 	// Address of server
 	address string
-
-	// Repo is the database object
-	// sqxRepo *connector.DbPool
-
 )
 
 // InitializeServer initializes all server connections
 func InitializeServer() error {
 	logf := srvLog.WithField("fn", "InitializeServer")
-	logger.ConfigureLogging() // configure logging
+
+	// configure logging
+	logger.ConfigureLogging()
 
 	startUpTime = time.Now()
-
+	// load system / env configs
 	config.LoadConfig()
+
+	t := time.Duration(config.GetInt("server.context.timeout"))
+	ctx, _ := context.WithTimeout(context.Background(), t*time.Second)
 
 	logf.Info("setting up routing...")
 	appRouter = router.NewRouter()
 	appRouter.Router = mux.NewRouter()
-
-	err := health.InitializeHealthCheck()
-	if err != nil {
-		logf.Warn("health monitor error: ", err)
-	}
 
 	logf.Info("initializing routes...")
 	router.InitRoutes(appRouter)
@@ -67,6 +64,20 @@ func InitializeServer() error {
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
 		Handler:      appRouter.Router, // Pass our instance of gorilla/mux in.
+	}
+
+	// setup db connection
+	repo := &connector.Repository{}
+	repo, err := repo.InitDBInstance(ctx)
+	if err != nil {
+		logf.Error("could not connect to db. Error: ", err)
+	}
+	defer repo.CloseDB()
+
+	// setup health monitoring
+	err = health.InitializeHealthCheck(ctx)
+	if err != nil {
+		logf.Warn("health monitor error: ", err)
 	}
 
 	return nil
@@ -97,7 +108,7 @@ func StartServer() {
 	defer shutdownServer()
 
 	logf.Info("starting server...")
-	logf.Info("App version: ", serverVersion, ", listening at: ", address)
+	logf.Info("App version: ", config.Get("app.version"), ", listening at: ", address)
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
 		if err := HTTPServer.ListenAndServe(); err != nil {

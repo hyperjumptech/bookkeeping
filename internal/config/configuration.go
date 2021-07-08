@@ -34,8 +34,17 @@ func LoadConfig() {
 	defCfg["server.timeout.idle"] = "60 seconds"
 	defCfg["server.timeout.graceshut"] = "15 seconds"
 
-	defCfg["health.local"] = "http://localhost:8080"
-	defCfg["health.sql.con"] = ""
+	defCfg["server.context.timeout"] = "30" // seconds
+
+	defCfg["db.host"] = "localhost"
+	defCfg["db.port"] = "3306"
+	defCfg["db.user"] = "awards"
+	defCfg["db.password"] = "awards"
+	defCfg["db.name"] = "db_maria"
+
+	defCfg["health.local"] = "localhost:8080"
+	defCfg["health.delay"] = "1"      // seconds
+	defCfg["health.interval"] = "120" // seconds
 
 	defCfg["jwt.accessKey"] = "sample_key"
 	defCfg["jwt.refreshKey"] = "sample_key"
