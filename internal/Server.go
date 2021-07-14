@@ -34,6 +34,9 @@ var (
 
 	// Address of server
 	address string
+
+	// dbRepo database repository
+	dbRepo connector.DBRepository
 )
 
 // InitializeServer initializes all server connections
@@ -67,12 +70,13 @@ func InitializeServer() error {
 	}
 
 	// setup db connection
-	repo := &connector.Repository{}
-	repo, err := repo.InitDBInstance(ctx)
+	dbRepo = &connector.MySqlDBRepository{}
+	err := dbRepo.Connect(ctx)
+
 	if err != nil {
-		logf.Error("could not connect to db. Error: ", err)
+		logf.Fatal("could not connect to db. Error: ", err)
+		panic("DB connection failed. please check log.")
 	}
-	defer repo.CloseDB()
 
 	// setup health monitoring
 	err = health.InitializeHealthCheck(ctx)

@@ -1,4 +1,6 @@
-DROP TABLE idn_award.accounts;
-DROP TABLE idn_award.currencies;
-DROP TABLE idn_award.journals;
-DROP TABLE idn_award.transactions;
+use devdb;
+
+DROP TABLE accounts;
+DROP TABLE currencies;
+DROP TABLE journals;
+DROP TABLE transactions;

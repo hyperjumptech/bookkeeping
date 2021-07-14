@@ -13,6 +13,10 @@ var (
 	initialized = false
 )
 
+func init() {
+	defCfg = make(map[string]string)
+}
+
 // LoadConfig loads configuration file
 func LoadConfig() {
 
@@ -20,7 +24,6 @@ func LoadConfig() {
 
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
-	defCfg = make(map[string]string)
 
 	defCfg["app.id"] = "idn-awards-go"
 	defCfg["app.version"] = "0.0.1"
