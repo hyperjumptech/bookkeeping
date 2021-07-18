@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	healthhttp "github.com/AppsFlyer/go-sundheit/http"
@@ -40,6 +41,9 @@ func InitRoutes(router *Router) {
 
 	// display routes under development
 	if config.Get("app.env") == "development" {
+		fs := http.FileServer(http.Dir("../../api/swagger"))
+		r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", fs))
+
 		walk(*r)
 	}
 }
