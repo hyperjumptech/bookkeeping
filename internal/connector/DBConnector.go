@@ -13,10 +13,7 @@ import (
 
 var (
 	log = logrus.WithField("module", "DBConnector")
-	UserIDContextKey = ContextKey("USER_IDENTIFICATION")
 )
-
-type ContextKey string
 
 // AccountRecord an entity representative of Account table
 type AccountRecord struct {
@@ -62,7 +59,6 @@ type JournalRecord struct {
 	CreatedAt time.Time
 	// CreatedBy related to created_by column
 	CreatedBy string
-
 }
 
 // TransactionRecord an entity representative of Transaction table
@@ -87,7 +83,6 @@ type TransactionRecord struct {
 	CreatedAt time.Time
 	// CreatedBy related to created_by column
 	CreatedBy string
-
 }
 
 // CurrenciesRecord an entity representative of Currency table
@@ -147,7 +142,7 @@ type DBRepository interface {
 	// Throws error if  the underlying database connection has problem. or, if there is no Account with
 	// specified accountNumber.
 	// It returns an instance of AccountRecord
-	GetAccount(ctx context.Context, accountNumber string) (*AccountRecord,  error)
+	GetAccount(ctx context.Context, accountNumber string) (*AccountRecord, error)
 
 	// ListAccount will list account in paginated fashion.
 	// Throws error if the underlying database connection has problem.
@@ -159,7 +154,7 @@ type DBRepository interface {
 	// CountAccounts will return a number of accounts in database.
 	// Throws error if the underlying database connection has problem.
 	// It will returns total number of accounts in the database.
-	CountAccounts(ctx context.Context) (int,error)
+	CountAccounts(ctx context.Context) (int, error)
 
 	// ListAccountByCoa will list all account that have the specified COA, the list presented in paginated fashion.
 	// Throws error if the underlying database connection has problem.
@@ -171,7 +166,7 @@ type DBRepository interface {
 	// CountAccountByCoa will return a number of accounts in database that belong to the specified COA number.
 	// Throws error if the underlying database connection has problem.
 	// It will returns total number of accounts in the database.
-	CountAccountByCoa(ctx context.Context, coa string) (int,error)
+	CountAccountByCoa(ctx context.Context, coa string) (int, error)
 
 	// FindAccountByName will list all account that have the specified name, the list presented in paginated fashion.
 	// Throws error if the underlying database connection has problem.
@@ -183,7 +178,7 @@ type DBRepository interface {
 	// CountAccountByName will return a number of accounts in database that have the name like the specified in the argument..
 	// Throws error if the underlying database connection has problem.
 	// It will returns total number of accounts in the database.
-	CountAccountByName(ctx context.Context, nameLike string) (int,error)
+	CountAccountByName(ctx context.Context, nameLike string) (int, error)
 
 	// InsertJournal will insert the data specified in the rec argument into database
 	// will return error if the underlying database connection has problem. or if the
@@ -231,7 +226,7 @@ type DBRepository interface {
 	// CountJournalByTimeRange will return a number of journals in database that been created within the time range.
 	// Throws error if the underlying database connection has problem.
 	// It will returns total number of journals in the database.
-	CountJournalByTimeRange(ctx context.Context, timeFrom, timeTo time.Time) (int,error)
+	CountJournalByTimeRange(ctx context.Context, timeFrom, timeTo time.Time) (int, error)
 
 	// InsertTransaction will insert the data specified in the rec argument into database
 	// will return error if the underlying database connection has problem. or if the
@@ -269,20 +264,20 @@ type DBRepository interface {
 	// It will return TransactionRecord sorted, starting from the offset with total maximum number or item, specified
 	// in the length argument.
 	// It returns list of TransactionRecord
-	ListTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time, offset, length int)([]*TransactionRecord, error)
+	ListTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time, offset, length int) ([]*TransactionRecord, error)
 
 	// CountTransactionByAccountNumber will return a number of accounts in database that belong to a speciffic
 	// accountNumber andbeen created within the time range.
 	// Throws error if the underlying database connection has problem.
 	// It will returns total number of transaction in the database as specified in the argument.
-	CountTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time)(int, error)
+	CountTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time) (int, error)
 
 	// ListTransactionByJournalID will list transactions , the transaction must belong to the
 	// specified journalID arguments.
 	// Throws error if the underlying database connection has problem.
 	// It will return TransactionRecord sorted.
 	// It returns list of TransactionRecord
-	ListTransactionByJournalID(ctx context.Context, journalID string)([]*TransactionRecord, error)
+	ListTransactionByJournalID(ctx context.Context, journalID string) ([]*TransactionRecord, error)
 
 	// InsertCurrency will insert the data specified in the rec argument into database
 	// will return error if the underlying database connection has problem. or if the

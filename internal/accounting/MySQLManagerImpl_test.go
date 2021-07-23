@@ -1,11 +1,10 @@
 package accounting
 
-
-
 import (
 	"context"
 	"github.com/IDN-Media/awards/internal/config"
 	"github.com/IDN-Media/awards/internal/connector"
+	"github.com/IDN-Media/awards/internal/contextkeys"
 	"github.com/hyperjumptech/acccore"
 	"math/big"
 	"testing"
@@ -13,8 +12,8 @@ import (
 )
 
 func TestAccounting_CreateNewAccount(t *testing.T) {
-
-	ctx := context.WithValue(context.Background(), connector.UserIDContextKey, "TESTING")
+	ctx := context.WithValue(context.Background(), contextkeys.XRequestID, "1234567890")
+	ctx = context.WithValue(ctx, contextkeys.UserIDContextKey, "TESTING")
 
 	var journalManager acccore.JournalManager
 	var accountManager acccore.AccountManager
@@ -25,10 +24,10 @@ func TestAccounting_CreateNewAccount(t *testing.T) {
 	if testing.Short() {
 		accountManager = &acccore.InMemoryAccountManager{}
 		transactionManager = &acccore.InMemoryTransactionManager{}
-		journalManager= &acccore.InMemoryJournalManager{}
-		exchangeManager= &acccore.InMemoryExchangeManager{}
-		uniqueIDGenerator =  &acccore.RandomGenUniqueIDGenerator {
-			Length:        10,
+		journalManager = &acccore.InMemoryJournalManager{}
+		exchangeManager = &acccore.InMemoryExchangeManager{}
+		uniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
+			Length:        16,
 			LowerAlpha:    false,
 			UpperAlpha:    true,
 			Numeric:       true,
@@ -38,9 +37,9 @@ func TestAccounting_CreateNewAccount(t *testing.T) {
 	} else {
 		config.GetInt("")
 		config.Set("db.host", "localhost")
-		config.Set("db.port", "3306")
+		config.Set("db.port", "6603")
 		config.Set("db.user", "devuser")
-		config.Set("db.password", "devpassword")
+		config.Set("db.password", "devuser")
 		config.Set("db.name", "devdb")
 
 		repo := &connector.MySqlDBRepository{}
@@ -50,12 +49,18 @@ func TestAccounting_CreateNewAccount(t *testing.T) {
 			t.FailNow()
 		}
 
+		err = repo.ClearTables(ctx)
+		if err != nil {
+			t.Errorf("cannot clear tables. got %s", err.Error())
+			t.FailNow()
+		}
+
 		journalManager = NewMySQLJournalManager(repo)
 		accountManager = NewMySQLAccountManager(repo)
 		transactionManager = NewMySQLTransactionManager(repo)
 		exchangeManager = NewMySQLExchangeManager(repo)
-		uniqueIDGenerator =  &acccore.RandomGenUniqueIDGenerator {
-			Length:        10,
+		uniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
+			Length:        16,
 			LowerAlpha:    false,
 			UpperAlpha:    true,
 			Numeric:       true,
@@ -63,22 +68,22 @@ func TestAccounting_CreateNewAccount(t *testing.T) {
 		}
 	}
 
-	err := exchangeManager.SetExchangeValueOf(ctx, "GLD", big.NewFloat(1.0), ctx.Value(connector.UserIDContextKey).(string))
+	_, err := exchangeManager.CreateCurrency(ctx, "GLD", "Gold Bullion", big.NewFloat(1.0), ctx.Value(contextkeys.UserIDContextKey).(string))
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 		t.FailNow()
 	}
 
-	acc := acccore.NewAccounting(accountManager, transactionManager, journalManager,uniqueIDGenerator)
+	acc := acccore.NewAccounting(accountManager, transactionManager, journalManager, uniqueIDGenerator)
 
-	account, err := acc.CreateNewAccount(ctx, "Test Account", "Gold base test user account", "1.1", "GLD", acccore.CREDIT, "aCreator")
+	account, err := acc.CreateNewAccount(ctx, "", "Test Account", "Gold base test user account", "1.1", "GLD", acccore.CREDIT, "aCreator")
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 		t.FailNow()
 	}
 	exist, err := acc.GetAccountManager().IsAccountIdExist(ctx, account.GetAccountNumber())
 	if err != nil {
-		t.Error(err.Error())
+		t.Error(err)
 		t.FailNow()
 	}
 	if !exist {
@@ -99,33 +104,83 @@ func TestAccounting_CreateNewAccount(t *testing.T) {
 }
 
 func TestAccounting_CreateNewJournal(t *testing.T) {
-	ctx := context.Background()
+	ctx := context.WithValue(context.Background(), contextkeys.XRequestID, "1234567890")
+	ctx = context.WithValue(ctx, contextkeys.UserIDContextKey, "TESTING")
 
-	mysqlJournalManager := &MySQLJournalManager{}
-	mysqlAccountManager := &MySQLAccountManager{}
-	mysqlTransactionManager := &MySQLTransactionManager{}
+	var journalManager acccore.JournalManager
+	var accountManager acccore.AccountManager
+	var transactionManager acccore.TransactionManager
+	var exchangeManager acccore.ExchangeManager
+	var uniqueIDGenerator acccore.UniqueIDGenerator
 
-	acc := acccore.NewAccounting(mysqlAccountManager, mysqlTransactionManager, mysqlJournalManager, &acccore.RandomGenUniqueIDGenerator{
-		Length:        10,
-		LowerAlpha:    false,
-		UpperAlpha:    true,
-		Numeric:       true,
-		CharSetBuffer: nil,
-	})
+	if testing.Short() {
+		accountManager = &acccore.InMemoryAccountManager{}
+		transactionManager = &acccore.InMemoryTransactionManager{}
+		journalManager = &acccore.InMemoryJournalManager{}
+		exchangeManager = &acccore.InMemoryExchangeManager{}
+		uniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
+			Length:        16,
+			LowerAlpha:    false,
+			UpperAlpha:    true,
+			Numeric:       true,
+			CharSetBuffer: nil,
+		}
+		acccore.ClearInMemoryTables()
+	} else {
+		config.GetInt("")
+		config.Set("db.host", "localhost")
+		config.Set("db.port", "6603")
+		config.Set("db.user", "devuser")
+		config.Set("db.password", "devuser")
+		config.Set("db.name", "devdb")
 
-	goldLoan, err := acc.CreateNewAccount(ctx, "Gold Loan", "Gold base loan reserve", "1.1", "GOLD", acccore.DEBIT, "aCreator")
+		repo := &connector.MySqlDBRepository{}
+		err := repo.Connect(ctx)
+		if err != nil {
+			t.Errorf("cannot connect to db. got %s", err.Error())
+			t.FailNow()
+		}
+
+		err = repo.ClearTables(ctx)
+		if err != nil {
+			t.Errorf("cannot clear tables. got %s", err.Error())
+			t.FailNow()
+		}
+
+		journalManager = NewMySQLJournalManager(repo)
+		accountManager = NewMySQLAccountManager(repo)
+		transactionManager = NewMySQLTransactionManager(repo)
+		exchangeManager = NewMySQLExchangeManager(repo)
+		uniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
+			Length:        16,
+			LowerAlpha:    false,
+			UpperAlpha:    true,
+			Numeric:       true,
+			CharSetBuffer: nil,
+		}
+	}
+
+	acc := acccore.NewAccounting(accountManager, transactionManager, journalManager, uniqueIDGenerator)
+
+	_, err := exchangeManager.CreateCurrency(ctx, "GOLD", "Gold Bullion", big.NewFloat(1.0), ctx.Value(contextkeys.UserIDContextKey).(string))
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	goldLoan, err := acc.CreateNewAccount(ctx, "", "Gold Loan", "Gold base loan reserve", "1.1", "GOLD", acccore.DEBIT, "aCreator")
 	if err != nil {
 		t.Error(err.Error())
 		t.FailNow()
 	}
 
-	alphaCreditor, err := acc.CreateNewAccount(ctx, "Gold Creditor Alpha", "Gold base debitor alpha", "2.1", "GOLD", acccore.CREDIT, "aCreator")
+	alphaCreditor, err := acc.CreateNewAccount(ctx, "", "Gold Creditor Alpha", "Gold base debitor alpha", "2.1", "GOLD", acccore.CREDIT, "aCreator")
 	if err != nil {
 		t.Error(err.Error())
 		t.FailNow()
 	}
 
-	betaDebitor, err := acc.CreateNewAccount(ctx, "Gold Debitor Alpha", "Gold base creditor beta", "3.1", "GOLD", acccore.DEBIT, "aCreator")
+	betaDebitor, err := acc.CreateNewAccount(ctx, "", "Gold Debitor Alpha", "Gold base creditor beta", "3.1", "GOLD", acccore.DEBIT, "aCreator")
 	if err != nil {
 		t.Error(err.Error())
 		t.FailNow()
@@ -150,6 +205,10 @@ func TestAccounting_CreateNewJournal(t *testing.T) {
 		t.Error(err.Error())
 		t.FailNow()
 	}
+	if journal == nil {
+		t.Error("Journal is nil")
+		t.FailNow()
+	}
 	t.Log(acc.GetJournalManager().RenderJournal(ctx, journal))
 
 	goldPurchaseTransaction := []acccore.TransactionInfo{
@@ -172,6 +231,20 @@ func TestAccounting_CreateNewJournal(t *testing.T) {
 		t.FailNow()
 	}
 	t.Log(acc.GetJournalManager().RenderJournal(ctx, journal))
+
+	pr, trxs, err := acc.GetTransactionManager().ListTransactionsOnAccount(ctx, time.Now().Add(-2*time.Hour), time.Now().Add(2*time.Hour), goldLoan, acccore.PageRequest{
+		PageNo:   1,
+		ItemSize: 10,
+		Sorts:    nil,
+	})
+	if len(trxs) == 0 {
+		t.Error("Empty transaction")
+		t.Fail()
+	}
+	if pr.TotalEntries == 0 {
+		t.Error("Empty TotalEntries")
+		t.Fail()
+	}
 
 	render, err := acc.GetTransactionManager().RenderTransactionsOnAccount(ctx, time.Now().Add(-2*time.Hour), time.Now().Add(2*time.Hour), goldLoan, acccore.PageRequest{
 		PageNo:   1,

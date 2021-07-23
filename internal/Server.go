@@ -9,6 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/IDN-Media/awards/internal/accounting"
+	"github.com/hyperjumptech/acccore"
+
 	"github.com/IDN-Media/awards/internal/config"
 	"github.com/IDN-Media/awards/internal/connector"
 	"github.com/IDN-Media/awards/internal/health"
@@ -51,11 +54,37 @@ func InitializeServer() error {
 	config.LoadConfig()
 
 	t := time.Duration(config.GetInt("server.context.timeout"))
-	ctx, _ := context.WithTimeout(context.Background(), t*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), t*time.Second)
+	defer cancel()
 
 	logf.Info("setting up routing...")
 	appRouter = router.NewRouter()
 	appRouter.Router = mux.NewRouter()
+
+	// setup db connection
+	dbRepo = &connector.MySqlDBRepository{}
+	err := dbRepo.Connect(ctx)
+	if err != nil {
+		logf.Fatal("could not connect to db. Error: ", err)
+		panic("DB connection failed. please check log.")
+	}
+
+	accounting.AccountMgr = accounting.NewMySQLAccountManager(dbRepo)
+	accounting.JournalMgr = accounting.NewMySQLJournalManager(dbRepo)
+	accounting.TransactionMgr = accounting.NewMySQLTransactionManager(dbRepo)
+	accounting.ExchangeMgr = accounting.NewMySQLExchangeManager(dbRepo)
+	accounting.UniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
+		Length:     16,
+		LowerAlpha: false,
+		UpperAlpha: true,
+		Numeric:    true,
+	}
+
+	// setup health monitoring
+	err = health.InitializeHealthCheck(ctx, dbRepo.(*connector.MySqlDBRepository))
+	if err != nil {
+		logf.Warn("health monitor error: ", err)
+	}
 
 	logf.Info("initializing routes...")
 	router.InitRoutes(appRouter)
@@ -67,21 +96,6 @@ func InitializeServer() error {
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
 		Handler:      appRouter.Router, // Pass our instance of gorilla/mux in.
-	}
-
-	// setup db connection
-	dbRepo = &connector.MySqlDBRepository{}
-	err := dbRepo.Connect(ctx)
-
-	if err != nil {
-		logf.Fatal("could not connect to db. Error: ", err)
-		panic("DB connection failed. please check log.")
-	}
-
-	// setup health monitoring
-	err = health.InitializeHealthCheck(ctx)
-	if err != nil {
-		logf.Warn("health monitor error: ", err)
 	}
 
 	return nil

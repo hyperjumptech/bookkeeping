@@ -4,8 +4,38 @@ package helpers
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 )
+
+// ParsePathParams parse request path param according to path template and extract its values.
+func ParsePathParams(template, path string) (map[string]string, error) {
+	var pth string
+	if strings.Contains(path, "?") {
+		pth = path[:strings.Index(path, "?")]
+	} else {
+		pth = path
+	}
+	templatePaths := strings.Split(template, "/")
+	pathPaths := strings.Split(pth, "/")
+	if len(templatePaths) != len(pathPaths) {
+		return nil, fmt.Errorf("pathElement length not equals to templateElement length")
+	}
+	ret := make(map[string]string)
+	for idx, templateElement := range templatePaths {
+		pathElement := pathPaths[idx]
+		if len(templateElement) > 0 && len(pathElement) > 0 {
+			if templateElement[:1] == "{" && templateElement[len(templateElement)-1:] == "}" {
+				tKey := templateElement[1 : len(templateElement)-1]
+				ret[tKey] = pathElement
+			} else if templateElement != pathElement {
+				return nil, fmt.Errorf("template %s not compatible with path %s", template, path)
+			}
+		}
+	}
+	return ret, nil
+}
 
 // ResponseJSON define the structure of all response
 type ResponseJSON struct {

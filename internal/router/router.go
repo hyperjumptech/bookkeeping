@@ -2,13 +2,14 @@ package router
 
 import (
 	"fmt"
+	"github.com/IDN-Media/awards/internal/accounting"
+	"github.com/IDN-Media/awards/internal/middlewares"
+	"github.com/IDN-Media/awards/static"
 	"net/http"
 	"strings"
 
 	healthhttp "github.com/AppsFlyer/go-sundheit/http"
-	"github.com/IDN-Media/awards/internal/config"
 	"github.com/IDN-Media/awards/internal/health"
-	"github.com/IDN-Media/awards/internal/logger"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,48 +35,109 @@ func InitRoutes(router *Router) {
 
 	// register middlewares
 	// r.Use(apmgorilla.Middleware()) // apmgorilla.Instrument(r.MuxRouter) // elastic apm: DISABLED
-	r.Use(logger.Logger) // your faithfull logger
+	r.Use(middlewares.SetupContextMiddleware, middlewares.Logger, middlewares.HMACMiddleware) // your faithfull logger
 
 	// health check endpoint. Not in a version path as it will seems to be a permanent endpoint (famous last words)
 	r.HandleFunc("/health", healthhttp.HandleHealthJSON(health.H)).Methods("GET")
+	r.HandleFunc("/devkey", middlewares.DevKey).Methods("PUT")
 
-	// display routes under development
-	if config.Get("app.env") == "development" {
-		fs := http.FileServer(http.Dir("../../api/swagger"))
-		r.PathPrefix("/docs/").Handler(http.StripPrefix("/docs/", fs))
+	r.HandleFunc("/api/v1/accounts/{AccountNumber}", accounting.GetAccount).Methods("GET")
+	r.HandleFunc("/api/v1/accounts/{accountNumber}/draw", accounting.DrawAccount).Methods("GET")
+	r.HandleFunc("/api/v1/accounts/{AccountNumber}/transactions", accounting.ListTransactionByAccount).Methods("GET")
+	r.HandleFunc("/api/v1/accounts", accounting.FindAccount).Methods("GET")
+	r.HandleFunc("/api/v1/accounts", accounting.CreateAccount).Methods("POST")
 
+	r.HandleFunc("/api/v1/journals", accounting.CreateJournal).Methods("POST")
+	r.HandleFunc("/api/v1/journals", accounting.ListJournal).Methods("GET")
+	r.HandleFunc("/api/v1/journals/reversal", accounting.CreateReversalJournal).Methods("POST")
+	r.HandleFunc("/api/v1/journals/{JournalID}", accounting.GetJournal).Methods("GET")
+	r.HandleFunc("/api/v1/journals/{JournalID}/draw", accounting.DrawJournal).Methods("GET")
+
+	r.HandleFunc("/api/v1/transactions/{TransactionID}", accounting.GetTransaction).Methods("GET")
+
+	r.HandleFunc("/api/v1/exchange/denom", accounting.GetCommonDenominator).Methods("GET")
+	r.HandleFunc("/api/v1/exchange/denom", accounting.SetCommonDenominator).Methods("PUT")
+
+	r.HandleFunc("/api/v1/currencies", accounting.ListCurrencies).Methods("GET")
+	r.HandleFunc("/api/v1/currencies/{code}", accounting.GetCurrency).Methods("GET")
+	r.HandleFunc("/api/v1/currencies/{code}", accounting.SetCurrency).Methods("PUT")
+
+	r.HandleFunc("/api/v1/exchange/{codefrom}/{codeto}", accounting.CalculateExchangeRate).Methods("GET")
+	r.HandleFunc("/api/v1/exchange/{codefrom}/{codeto}/{amount}", accounting.CalculateExchange).Methods("GET")
+
+	fmt.Println("----------------------------------------------------")
+
+	r.HandleFunc("/docs", StaticServer("")).Methods("GET")
+	r.HandleFunc("/docs/", StaticServer("")).Methods("GET")
+
+	tree := static.GetPathTree("api")
+	for _, t := range tree {
+		pth := strings.ReplaceAll(t, "api/swagger", "/docs")
+		if pth[:5] != "[DIR]" {
+			r.HandleFunc(pth, StaticServer(t)).Methods("GET")
+		}
+	}
+
+	if log.GetLevel() == log.DebugLevel {
 		walk(*r)
+	}
+}
+
+func StaticServer(path string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		if r.URL.Path == "/docs" || r.URL.Path == "/docs/" {
+			w.Header().Set("Location", "/docs/index.html")
+			w.WriteHeader(http.StatusMovedPermanently)
+			return
+		} else if strings.HasSuffix(r.URL.Path, "/") {
+			w.Header().Set("Location", r.URL.Path+"index.html")
+			w.WriteHeader(http.StatusMovedPermanently)
+			return
+		}
+		filePath := strings.ReplaceAll(r.URL.Path, "/docs/", "api/swagger/")
+		dirFilePath := "[DIR]" + filePath
+
+		if path == dirFilePath {
+			w.Header().Set("Location", r.URL.Path+"/index.html")
+			w.WriteHeader(http.StatusMovedPermanently)
+			return
+		} else if path == filePath {
+			fdata, err := static.GetFile(filePath)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+				return
+			}
+			w.Header().Set("Content-Type", fdata.ContentType)
+			w.WriteHeader(http.StatusOK)
+			w.Write(fdata.Bytes)
+			return
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+		}
 	}
 }
 
 // walk runs the mux.Router.Walk method to print all the registered routes
 func walk(r mux.Router) {
+	log.Debugf("REGISTERED PATHS:")
 	err := r.Walk(func(route *mux.Route, router *mux.Router, ancestors []*mux.Route) error {
-		pathTemplate, err := route.GetPathTemplate()
-		if err == nil {
-			fmt.Println("ROUTE:", pathTemplate)
+		var pathTemplates, methods string
+		pathTemplates, err := route.GetPathTemplate()
+		if err != nil {
+			pathTemplates = "err"
 		}
-		pathRegexp, err := route.GetPathRegexp()
-		if err == nil {
-			fmt.Println("Path regexp:", pathRegexp)
-		}
-		queriesTemplates, err := route.GetQueriesTemplates()
-		if err == nil {
-			fmt.Println("Queries templates:", strings.Join(queriesTemplates, ","))
-		}
-		queriesRegexps, err := route.GetQueriesRegexp()
-		if err == nil {
-			fmt.Println("Queries regexps:", strings.Join(queriesRegexps, ","))
-		}
-		methods, err := route.GetMethods()
-		if err == nil {
-			fmt.Println("Methods:", strings.Join(methods, ","))
-		}
-		fmt.Println()
+		methodArr, err := route.GetMethods()
+		methods = strings.Join(methodArr, ",")
+		log.Debugf("    Path : %s. Methods : %s", pathTemplates, methods)
 		return nil
 	})
-
 	if err != nil {
 		log.Error(err)
 	}
+	log.Debugf("END REGISTERED PATHS")
 }

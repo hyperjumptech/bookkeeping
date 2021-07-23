@@ -19,8 +19,12 @@ var (
 )
 
 // InitializeHealthCheck initializes health monitors
-func InitializeHealthCheck(ctx context.Context) error {
+func InitializeHealthCheck(ctx context.Context, repo *connector.MySqlDBRepository) error {
 	logf := healthLog.WithField("fn", "InitializeHealthCheck")
+
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
 
 	// create a new health instance
 	H = gosundheit.New()
@@ -50,8 +54,7 @@ func InitializeHealthCheck(ctx context.Context) error {
 	}
 
 	// For checking database connections
-	db := connector.GetRepo()
-	dbCheck, err := checks.NewPingCheck("db.check", db.DB)
+	dbCheck, err := checks.NewPingCheck("db.check", repo.DB())
 	if err != nil {
 		logf.Error("could not setup dbCheck")
 	}

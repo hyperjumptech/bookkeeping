@@ -1,0 +1,1615 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "description": "This is the awards service swagger api documentation.  You can find\nout more about Swagger at\n[http://swagger.io](http://swagger.io) or on\n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n",
+    "version": "0.0.1",
+    "title": "awards.idn.media",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "email": "apiteam@swagger.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "description": "HTTP Localhost",
+      "url": "http://localhost:50051"
+    }
+  ],
+  "tags": [
+    {
+      "name": "system",
+      "description": "system apis"
+    },
+    {
+      "name": "account",
+      "description": "apis to work with account(s)"
+    },
+    {
+      "name": "journal",
+      "description": "apis to work with journal(s)"
+    },
+    {
+      "name": "transaction",
+      "description": "apis to work with transaction(s)"
+    },
+    {
+      "name": "exchange",
+      "description": "apis to work with exchanges(s)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "health check",
+        "description": "Fetches system health check",
+        "operationId": "healthCheckId",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheckResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid status value"
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{accountNumber}": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "gets an account",
+        "description": "Get account details from an account number",
+        "operationId": "getAccountID",
+        "parameters": [
+          {
+            "required": true,
+            "name": "accountNumber",
+            "description": "The account number to fetch",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "The specified account number not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "account"
+        ],
+        "summary": "update an account",
+        "description": "Get account details from an account number",
+        "operationId": "updateAccount",
+        "parameters": [
+          {
+            "required": true,
+            "name": "accountNumber",
+            "description": "The account number to update",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccountBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "The specified account number not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/accounts/{accountNumber}/draw": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "draws how the account look like",
+        "description": "Draw the account look like",
+        "operationId": "drawAccount",
+        "parameters": [
+          {
+            "required": true,
+            "name": "accountNumber",
+            "description": "The account number to fetch",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },{
+            "name": "from",
+            "required": true,
+            "description": "the starting time on which transaction will be included. Format : YYYY-MM-DDTHH:MM:SS",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },{
+            "name": "until",
+            "required": true,
+            "description": "the ending time on which transaction will be included. Format : YYYY-MM-DDTHH:MM:SS",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },{
+            "name": "page",
+            "required": true,
+            "description": "the number of page to open",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },{
+            "name": "size",
+            "required": true,
+            "description": "number of item in the page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "text/plain": {}
+            }
+          },
+          "404": {
+            "description": "The specified account number not found"
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "invalid payload"
+          }
+        },
+        "security": [{
+          "HMAC": []
+        }]
+      }
+    },
+    "/api/v1/accounts/{accountNumber}/transactions": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "gets an account",
+        "description": "Get account details from an account number",
+        "operationId": "getAccountTransactionID",
+        "parameters": [
+          {
+            "required": true,
+            "name": "accountNumber",
+            "description": "The account number to fetch",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "description": "the starting time on which transaction will be included. Format : YYYY-MM-DDTHH:MM:SS",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "description": "the ending time on which transaction will be included. Format : YYYY-MM-DDTHH:MM:SS",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "description": "the number of page to open",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "required": true,
+            "description": "number of item in the page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindAccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "The specified account number not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/accounts": {
+      "get": {
+        "tags": [
+          "account"
+        ],
+        "summary": "finds an account",
+        "description": "Find an account from an name",
+        "operationId": "findAccountID",
+        "parameters": [
+          {
+            "name": "name",
+            "required": true,
+            "description": "name of account to search for",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "description": "the number of page to open",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "required": true,
+            "description": "number of item in the page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindAccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "account"
+        ],
+        "summary": "creates new account",
+        "description": "Create a new account if not exist",
+        "operationId": "createAccountId",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccountBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateAccountResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/journals": {
+      "post": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "Creates new journal entry",
+        "description": "Create a new journal entry from the given payloads",
+        "operationId": "CreateJournal",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateJournalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateJournalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "500": {
+            "description": "system errors"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "find journals",
+        "description": "Find journals",
+        "operationId": "FindJournal",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "description": "The starting time range on the journaling time",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "description": "The ending time range on the journaling time",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "description": "The page number to open",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "size",
+            "required": true,
+            "description": "Number of items to be included in the page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FindJournalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/journals/reversal": {
+      "post": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "creates a reversal",
+        "description": "Create a new reversal entry",
+        "operationId": "createReversalID",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReversalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateReversalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload or journal already reversed"
+          },
+          "404": {
+            "description": "journal to reverse not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/journals/{JournalID}": {
+      "get": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "gets a journal",
+        "description": "Get a journal from its id",
+        "operationId": "getJournalID",
+        "parameters": [
+          {
+            "name": "JournalID",
+            "required": true,
+            "description": "id of account to search for",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetJournalResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "journal not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/journals/{JournalID}/draw": {
+      "get": {
+        "tags": [
+          "journal"
+        ],
+        "summary": "Draw a journal",
+        "description": "Draw a journal for debugging",
+        "operationId": "DrawJournal",
+        "parameters": [
+          {
+            "name": "JournalID",
+            "required": true,
+            "description": "id of account to search for",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully draw",
+            "content": {
+              "text/plain": {}
+            }
+          },
+          "404": {
+            "description": "journal not found"
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [{
+          "HMAC": []
+        }]
+      }
+    },
+    "/api/v1/transactions/{TransactionID}": {
+      "get": {
+        "tags": [
+          "transaction"
+        ],
+        "summary": "gets a transaction",
+        "description": "Gets a transaction by account",
+        "operationId": "getTransactionID",
+        "parameters": [
+          {
+            "name": "TransactionID",
+            "required": true,
+            "description": "id of account to search for",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTransactionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "transaction not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/exchange/denom": {
+      "get": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "Get the current common denominator",
+        "description": "Get the common denominator value",
+        "operationId": "getCommonDenom",
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonDenomResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "Set the current common denominator",
+        "description": "Set the common denominator value",
+        "operationId": "setCommonDenom",
+        "parameters": [
+          {
+            "name": "denom",
+            "required": true,
+            "description": "Common denominator value to set",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommonDenomResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/currencies": {
+      "get": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "gets a all currency types",
+        "description": "Gets a transaction by account",
+        "operationId": "getCurrenciesID",
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyListResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/currencies/{code}": {
+      "get": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "gets a currency detail",
+        "description": "Gets a transaction by account",
+        "operationId": "getCurrency",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "description": "the currency code to fetch",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "set or create a currency detail",
+        "description": "Gets a transaction by account",
+        "operationId": "setCurrency",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "description": "the currency code to update or create",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CurrencyRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrencyResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/exchange/{codefrom}/{codeto}": {
+      "get": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "gets exchange rate between two currency",
+        "description": "gets exchange rate between two currency",
+        "operationId": "getExchangeRate",
+        "parameters": [
+          {
+            "name": "codefrom",
+            "required": true,
+            "description": "the source currency code",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codeto",
+            "required": true,
+            "description": "the target currency code",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "currency code not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    },
+    "/api/v1/exchange/{codefrom}/{codeto}/{amount}": {
+      "get": {
+        "tags": [
+          "exchange"
+        ],
+        "summary": "gets exchange amount between two currency",
+        "description": "gets exchange amount between two currency",
+        "operationId": "getExchange",
+        "parameters": [
+          {
+            "name": "codefrom",
+            "required": true,
+            "description": "the source currency code",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "codeto",
+            "required": true,
+            "description": "the target currency code",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "amount",
+            "required": true,
+            "description": "the amount of the source currency to exchange",
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully get",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExchangeResponseBody"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "invalid payload"
+          },
+          "401": {
+            "description": "unauthorized"
+          },
+          "404": {
+            "description": "currency code not found"
+          }
+        },
+        "security": [
+          {
+            "HMAC": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseResponse": {
+        "description": "Base Response Structure",
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SUCCESS",
+              "FAIL"
+            ],
+            "default": "SUCCESS"
+          },
+          "data": {
+            "type": "object"
+          },
+          "error_code": {
+            "type": "integer"
+          }
+        }
+      },
+      "HealthCheckResponse": {
+        "description": "HealthCheck Response",
+        "type": "object",
+        "properties": {
+          "DNS.url.check": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "type": "string",
+                "example": "2021-07-22T22:10:53.619441167+07:00"
+              },
+              "duration": {
+                "type": "integer",
+                "example": 1494247
+              },
+              "contiguousFailures": {
+                "type": "integer",
+                "example": 3
+              },
+              "timeOfFirstFailure": {
+                "type": "string",
+                "example": "2021-07-22T22:10:52.618219239+07:00"
+              }
+            }
+          },
+          "db.check": {
+            "type": "object",
+            "properties": {
+              "timestamp": {
+                "type": "string",
+                "example": "2021-07-22T22:14:53.621426119+07:00"
+              },
+              "duration": {
+                "type": "integer",
+                "example": 673192
+              },
+              "contiguousFailures": {
+                "type": "integer",
+                "example": 0
+              },
+              "timeOfFirstFailure": {
+                "type": "string",
+                "example": null
+              }
+            }
+          }
+        }
+      },
+      "CreateAccountBody": {
+        "description": "CreateAccount payload",
+        "type": "object",
+        "required": ["name", "description", "coa", "currency","alignment","creator"],
+        "properties": {
+          "account_number": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coa": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "alignment": {
+            "enum" :[
+              "DEBIT", 
+              "CREDIT"
+            ],
+            "default": "DEBIT",
+            "type": "string"
+          },
+          "creator": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateAccountResponse": {
+        "description": "CreateAccount Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateJournalBody": {
+        "description": "CreateJournal payload",
+        "type": "object",
+        "required": ["description", "transactions","creator"],
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionInfo"
+            }
+          },
+          "creator": {
+            "type": "string"
+          }
+        }
+      },
+      "TransactionInfo": {
+        "description": "Transaction details",
+        "type": "object",
+        "required": ["description", "account_number", "alignment", "amount"],
+        "properties": {
+          "account_number": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "alignment": {
+            "enum" :[
+              "DEBIT", 
+              "CREDIT"
+            ],
+            "default": "DEBIT",
+            "type": "string"
+          },
+          "amount": {
+            "type": "integer"
+          }
+        }
+      },
+      "TransactionInfoWithId": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TransactionInfo"
+          }
+        ],
+        "properties": {
+          "transaction_id": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateJournalResponse": {
+        "description": "CreateJournal Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateReversalBody": {
+        "description": "CreateReversal payload",
+        "type": "object",
+        "properties": {
+              "description": {
+                "type": "string"
+              },
+              "journal_id": {
+                "type": "string"
+              },
+              "creator": {
+                "type": "string"
+              }
+        }
+      },
+      "CreateReversalResponse": {
+        "description": "CreateReversal Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAccountBody": {
+        "description": "Get Account Response",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coa": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "alignment": {
+            "enum" :[
+              "DEBIT", 
+              "CREDIT"
+            ],
+            "default": "DEBIT",
+            "type": "string"
+          },
+          "creator": {
+            "type": "string"
+          }
+        }
+      },
+      "GetAccountResponse": {
+        "description": "GetAccount Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "account_number": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "coa": {
+                "type": "string"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "alignment": {
+                "enum" :[
+                  "DEBIT", 
+                  "CREDIT"
+                ],
+                "default": "DEBIT",
+                "type": "string"
+              },
+              "balance": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "FindAccountResponse": {
+        "description": "FindAccount Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "accounts": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CreateAccountBody"
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/PageResponse"
+              }
+            }
+          }
+        }
+      },
+      "Journal": {
+        "description": "GetJournal Response",
+        "type": "object",
+        "properties": {
+          "journal_id": {
+            "type": "string"
+          },
+          "journaling_time": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "total_amount": {
+            "type": "string"
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransactionInfoWithId"
+            }
+          }
+        }
+      },
+      "FindJournalResponse": {
+        "description": "Find Journal Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "journals": {
+                  "$ref": "#/components/schemas/Journal"
+                },
+                "pagination": {
+                  "$ref": "#/components/schemas/PageResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GetJournalResponse": {
+        "description": "GetJournal Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Journal"
+          }
+        }
+      },
+      "GetTransactionBody": {
+        "description": "GetTransaction payload",
+        "type": "object",
+        "properties": {
+          "account_number": {
+            "type": "string"
+          },
+          "time_from": {
+            "type": "string"
+          },
+          "time_until": {
+            "type": "string"
+          }
+        }
+      },
+      "GetTransactionResponse": {
+        "description": "GetTransaction Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "account_number": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "alignment": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "CommonDenomResponseBody": {
+        "description": "Common denominator value response body",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "number"
+          }
+        }
+      },
+      "CurrencyRequestBody": {
+        "description": "Currency data in request body",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "exchange": {
+            "type": "number"
+          },
+          "author": {
+            "type": "string"
+          }
+        }
+      },
+      "CurrencyListResponseBody": {
+        "description": "Currency data in response body",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "exchange": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ExchangeResponseBody": {
+        "description": "Currency data in response body",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "number"
+          }
+        }
+      },
+      "CurrencyResponseBody": {
+        "description": "Currency data in response body",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "exchange": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      },
+      "PageResponse": {
+        "type": "object",
+        "properties": {
+          "request_page" : {
+            "type" : "integer"
+          },"request_size" : {
+            "type" : "integer"
+          },"total_entries" : {
+            "type" : "integer"
+          },"total_pages" : {
+            "type" : "integer"
+          },"page" : {
+            "type" : "integer"
+          },"page_size" : {
+            "type" : "integer"
+          },"next_page" : {
+            "type" : "integer"
+          },"previous_page" : {
+            "type" : "integer"
+          },"last_page" : {
+            "type" : "integer"
+          },"first_page" : {
+            "type" : "integer"
+          },"is_first" : {
+            "type" : "boolean"
+          },"is_last" : {
+            "type" : "boolean"
+          },"have_previous" : {
+            "type" : "boolean"
+          },"have_next" : {
+            "type" : "boolean"
+          },"offset" : {
+            "type" : "integer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "HMAC": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  }
+}

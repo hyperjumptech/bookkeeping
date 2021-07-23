@@ -40,17 +40,17 @@ func LoadConfig() {
 	defCfg["server.context.timeout"] = "30" // seconds
 
 	defCfg["db.host"] = "localhost"
-	defCfg["db.port"] = "3306"
-	defCfg["db.user"] = "awards"
-	defCfg["db.password"] = "awards"
-	defCfg["db.name"] = "db_maria"
+	defCfg["db.port"] = "6603"
+	defCfg["db.user"] = "devuser"
+	defCfg["db.password"] = "devuser"
+	defCfg["db.name"] = "devdb"
 
 	defCfg["health.local"] = "localhost:8080"
 	defCfg["health.delay"] = "1"      // seconds
 	defCfg["health.interval"] = "120" // seconds
 
-	defCfg["jwt.accessKey"] = "sample_key"
-	defCfg["jwt.refreshKey"] = "sample_key"
+	defCfg["hmac.secret"] = "th1s?MusT#b3!4*veRY%d33p#53creT"
+	defCfg["hmac.age.minute"] = "10"
 
 	for k := range defCfg {
 		err := viper.BindEnv(k)
