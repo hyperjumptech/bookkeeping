@@ -1,0 +1,102 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Open Journal</h1>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Parameter</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="journalNumberField">Journal Number</label>
+                        <input type="text" class="form-control" id="journalNumberField" placeholder="Journal Number">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="OpenJournal();">Open</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-9 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Journal Information</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="journalIdField">Journal Number</label>
+                                <input type="text" class="form-control" id="journalIdField" placeholder="Journal Number" readonly>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="journalTimeField">Journal Time</label>
+                                <input type="text" class="form-control" id="journalTimeField" placeholder="Journal Time" readonly>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="journalAmountField">Journal Amount</label>
+                                <input type="text" class="form-control" id="journalAmountField" placeholder="Journal Amount" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="journalDescriptionField">Description</label>
+                                <input type="text" class="form-control" id="journalDescriptionField" placeholder="Journal Description" readonly>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="journalIsReversalField">Journal Is a Reversal</label>
+                                <input type="text" class="form-control" id="journalIsReversalField" placeholder="Journal Is Reversal" readonly>
+                            </div>
+                        </div>
+                        <div class="col-xl-4 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="reversedJournalField">Reversed Journal</label>
+                                <input type="text" class="form-control" id="reversedJournalField" placeholder="Journal Number" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 col-md-6 mb-4">
+                            <table class="table table-hover table-sm">
+                                <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">Trx ID</th>
+                                    <th scope="col">Account</th>
+                                    <th scope="col">Desc</th>
+                                    <th scope="col">DEBIT</th>
+                                    <th scope="col">CREDIT</th>
+                                </tr>
+                                </thead>
+                                <tbody id="transactionAccountRows"></tbody>
+                                <tfoot>
+                                <tr>
+                                    <th scope="row" colspan="3">Total</th>
+                                    <th id="totalDebit">0</th>
+                                    <th id="totalCredit">0</th>
+                                </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-4 col-md-6 mb-4">
+                        <button type="button" class="btn btn-danger" onclick="ReverseJournal();">Reverse This Journal</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

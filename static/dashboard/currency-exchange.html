@@ -1,0 +1,131 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Currency Exchange</h1>
+</div>
+
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Source Currency</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <form>
+                                <div class="form-group">
+                                    <select class="form-control" id="exchangeCurrencySource">
+                                        <option selected>IDNGOLD - IDN Gold Currency</option>
+                                        <option>IDNPOINT - IDN Point Currency</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Earnings (Annual) Card Example -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Amount</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="exchangeCurrencyAmount" placeholder="Amount for exchange">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-scale-balanced fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tasks Card Example -->
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Target Currency</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <form>
+                                <div class="form-group">
+                                    <select class="form-control" id="exchangeCurrencyTarget">
+                                        <option selected>IDNGOLD - IDN Gold Currency</option>
+                                        <option>IDNPOINT - IDN Point Currency</option>
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            <form>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-primary" onclick="CalculateExchange();">Calculate</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-scale-balanced fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-9 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Exchange Simulation</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="exchangeResult">
+                            IDNGOLD 1000 = IDNPOINT 23000
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-scale-balanced fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    PopulateCurrenciesForExchanges();
+</script>

@@ -1,0 +1,67 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Create Account</h1>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-7 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">New Account Information</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="newAccountNumberField">Account Number</label>
+                        <input type="text" class="form-control" id="newAccountNumberField" aria-describedby="newAccountNumberFieldHelp" placeholder="Account Number">
+                        <small id="newAccountNumberFieldHelp" class="form-text text-muted">Leave this empty if you want auto assigned new number</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAccountNameField">Account Name</label>
+                        <input type="text" class="form-control" id="newAccountNameField" aria-describedby="newAccountNumberFieldHelp" placeholder="Account Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="newAccountDescriptionField">Description</label>
+                        <input type="text" class="form-control" id="newAccountDescriptionField" aria-describedby="newAccountNumberFieldHelp" placeholder="Description">
+                    </div>
+                    <div class="form-group">
+                        <label for="newAccountCOAField">COA</label>
+                        <input type="text" class="form-control" id="newAccountCOAField" aria-describedby="newAccountNumberFieldHelp" placeholder="COA Numbers">
+                    </div>
+                    <div class="form-group">
+                        <label for="newAccountCurrency">Currency</label>
+                        <select class="form-control" id="newAccountCurrency">
+                            <option selected>IDNGOLD - IDN Gold Currency</option>
+                            <option>IDNPOINT - IDN Point Currency</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newAccountAlignment">Alignment</label>
+                        <select class="form-control" id="newAccountAlignment">
+                            <option value="DEBIT" selected>DEBIT</option>
+                            <option value="CREDIT">CREDIT</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="CreateNewAccount();">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Column -->
+    <div class="col-lg-5 mb-4" id="createAccountResult">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                Please complete the form
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    PopulateCurrencies();
+</script>

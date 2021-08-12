@@ -1,0 +1,152 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Account Detail</h1>
+</div>
+
+<!-- Content Row -->
+<div class="row">
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary" id="accountInfoLabel">No : 32342344234</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="accountNumberFindField">Account Number</label>
+                        <input type="text" class="form-control" id="accountNumberFindField" placeholder="Account Number" value="32342344234" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountNameFindField">Name</label>
+                        <input type="text" class="form-control" id="accountNameFindField" placeholder="Name" value="JohnDoe" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountDescriptionField">Description</label>
+                        <input type="text" class="form-control" id="accountDescriptionField" placeholder="Description" value="" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountCOA">COA Number</label>
+                        <input type="text" class="form-control" id="accountCOA" placeholder="COA" value="1.1.1" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountCurrencyField">Currency</label>
+                        <input type="text" class="form-control" id="accountCurrencyField" placeholder="Currency" value="GOLD" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountAlignmentField">Alignment</label>
+                        <input type="text" class="form-control" id="accountAlignmentField" placeholder="Alignment" value="DEBIT" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="accountBalanceField">Balance</label>
+                        <input type="text" class="form-control" id="accountBalanceField" placeholder="Alignment" value="DEBIT" readonly>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-9 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Account Transactions</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                        <div class="col-xl-6 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="transactionTimeFrom">From</label>
+                                <input type="text" class="form-control" id="transactionTimeFrom" placeholder="Time From">
+                            </div>
+                        </div>
+                        <div class="col-xl-6 col-md-6 mb-4">
+                            <div class="form-group">
+                                <label for="transactionTimeUntil">Until</label>
+                                <input type="text" class="form-control" id="transactionTimeUntil" placeholder="Time Until">
+                            </div>
+                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-2 col-md-6 mb-4">
+                        <button type="button" class="btn btn-primary" onclick="LoadAccountTransactions(1,30);">Load Transactions</button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                            <button type="button" class="btn btn-secondary" id="listTransactionFirstPageTop">&lt;&lt;</button>
+                            <button type="button" class="btn btn-secondary" id="listTransactionPrevPageTop">&lt;</button>
+
+                            <div class="btn-group" role="group">
+                                <button id="btpGroupGoToTransactionListPageTop" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Page 1
+                                </button>
+                                <div id="btpGroupGoToTransactionItemTop" class="dropdown-menu" aria-labelledby="btpGroupGoToTransactionListPageTop">
+                                    <a class="dropdown-item" href="#">Page 1</a>
+                                    <a class="dropdown-item" href="#">Page 2</a>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-secondary" id="listTransactionNextPageTop">&gt;</button>
+                            <button type="button" class="btn btn-secondary" id="listTransactionLastPageTop">&gt;&gt;</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12 col-md-6 mb-4">
+                        <table class="table">
+                            <thead class="thead-light">
+                            <tr>
+                                <th scope="col">Time</th>
+                                <th scope="col">Journal No</th>
+                                <th scope="col">Tx No</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">DEBIT</th>
+                                <th scope="col">CREDIT</th>
+                                <th scope="col">Balance</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody id="transactionListRows"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-6 col-md-6 mb-4">
+                        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                            <button type="button" class="btn btn-secondary" id="listTransactionFirstPageBottom">&lt;&lt;</button>
+                            <button type="button" class="btn btn-secondary" id="listTransactionPrevPageBottom">&lt;</button>
+
+                            <div class="btn-group" role="group">
+                                <button id="btpGroupGoToTransactionListPageBottom" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Page 1
+                                </button>
+                                <div id="btpGroupGoToTransactionItemBottom" class="dropdown-menu" aria-labelledby="btpGroupGoToTransactionListPageBottom">
+                                    <a class="dropdown-item" href="#">Page 1</a>
+                                    <a class="dropdown-item" href="#">Page 2</a>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-secondary" id="listTransactionNextPageBottom">&gt;</button>
+                            <button type="button" class="btn btn-secondary" id="listTransactionLastPageBottom">&gt;&gt;</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+        $('#transactionTimeFrom').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            todayHighlight: true
+        });
+        $('#transactionTimeUntil').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            todayHighlight: true
+        });
+</script>

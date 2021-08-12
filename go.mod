@@ -6,10 +6,11 @@ require (
 	github.com/AppsFlyer/go-sundheit v0.4.0
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/gorilla/mux v1.8.0
-	github.com/hyperjumptech/acccore v1.0.1
+	github.com/hyperjumptech/acccore v1.0.3
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
+	github.com/rs/cors v1.8.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.8.0
 	github.com/stretchr/testify v1.7.0 // indirect

@@ -1,0 +1,28 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">List Currencies</h1>
+</div>
+
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Currencies</h6>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead class="thead-light">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Code</th>
+                <th scope="col">Name</th>
+                <th scope="col">Exchange</th>
+            </tr>
+            </thead>
+            <tbody id="currencyListBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    GetCurrencyList();
+</script>

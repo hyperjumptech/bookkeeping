@@ -42,6 +42,11 @@ or
 Swagger docs can be seen by hitting the `/docs` endpoint of the running instance.
 The file swagger.json can be found in `/api/swagger/spec`  
 
+## Admin Dashboard
+
+Dashboard can be accessed through `/dashboard` endpoint in the running instance.
+User need to know the `SecretKey` used to generate the HMAC 
+API Key.
 
 ## File structure 
 (subject to change)

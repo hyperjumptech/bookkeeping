@@ -1,0 +1,92 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">New Journal</h1>
+    <a href="#" onclick="ResetNewJournalForm();" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">New Journal</a>
+</div>
+
+<div class="row">
+
+
+    <div class="col-xl-9 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Transactions</h6>
+            </div>
+            <div class="card-body">
+                <div class="card-body">
+                    <div id="newJournalFormNotification" class="px-3 py-3 bg-gradient-primary text-white">Please add accounts using the Account Lookup</div>
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label for="newJournalDescription">Describe the journal</label>
+                        <textarea class="form-control" id="newJournalDescription" rows="2"></textarea>
+                    </div>
+                    <table class="table table-hover table-sm">
+                        <thead class="thead-light">
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Account</th>
+                            <th scope="col">Currency</th>
+                            <th scope="col">Alignment</th>
+                            <th scope="col">Desc</th>
+                            <th scope="col">DEBIT</th>
+                            <th scope="col">CREDIT</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="transactionAccountRows"></tbody>
+                        <tfoot>
+                        <tr>
+                            <th scope="row" colspan="5">Total</th>
+                            <th id="totalDebit">0</th>
+                            <th id="totalCredit">0</th>
+                            <td></td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                    <button type="button" class="btn btn-primary" onclick="PostJournal();">Post Journal</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Account Lookup</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="searchNameOrAccountField">Search Account</label>
+                        <input type="text" class="form-control" id="searchNameOrAccountField" placeholder="Name or Number" onkeyup="PopulateAccountList();">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountSelectionList">Choose account to add</label>
+                        <select class="form-control" id="accountSelectionList" size="5"></select>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="alignmentOptionRadio" id="debitAlignment" value="DEBIT" checked>
+                            <label class="form-check-label" for="debitAlignment">DEBIT</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="alignmentOptionRadio" id="creditAlignment" value="CREDIT">
+                            <label class="form-check-label" for="creditAlignment">CREDIT</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionDescriptionField">Description</label>
+                        <input type="text" class="form-control" id="transactionDescriptionField" placeholder="Transaction description">
+                    </div>
+                    <div class="form-group">
+                        <label for="transactionAmountField">Amount</label>
+                        <input type="text" class="form-control" id="transactionAmountField" placeholder="Amount to transact">
+                    </div>
+
+                    <button type="button" class="btn btn-primary" onclick="AddTransactionToJournal();">Add</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -22,6 +22,9 @@ test-short: lint
 test: lint
 	go test ./... -v -race -covermode=atomic -coverprofile=coverage.out
 
+run: build
+	go run cmd/Main.go
+
 test-coverage: test
 	go tool cover -html=coverage.out
 

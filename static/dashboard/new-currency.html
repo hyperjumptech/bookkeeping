@@ -1,0 +1,45 @@
+<!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">New Currency</h1>
+</div>
+
+
+<!-- Content Row -->
+<div class="row">
+
+    <!-- Earnings (Monthly) Card Example -->
+    <div class="col-xl-7 col-md-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">New Currency Information</h6>
+            </div>
+            <div class="card-body">
+                <form>
+                    <div class="form-group">
+                        <label for="newCurrencyCodeField">Currency Code</label>
+                        <input type="text" class="form-control" id="newCurrencyCodeField" placeholder="Currency Code. e.g. USD">
+                    </div>
+                    <div class="form-group">
+                        <label for="newCurrencyNameField">Currency Name</label>
+                        <input type="text" class="form-control" id="newCurrencyNameField" placeholder="Currency Name. e.g. United State Dollar">
+                    </div>
+                    <div class="form-group">
+                        <label for="exchangeRateField">Exchange Rate</label>
+                        <input type="text" class="form-control" id="exchangeRateField" placeholder="1.0">
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="CreateNewCurrency();">Create</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Column -->
+    <div class="col-lg-5 mb-4" id="createCurrencyResult">
+        <div class="card bg-primary text-white shadow">
+            <div class="card-body">
+                Please complete the form
+            </div>
+        </div>
+    </div>
+
+</div>

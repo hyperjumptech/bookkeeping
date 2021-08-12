@@ -343,6 +343,10 @@ func (jm *MySQLJournalManager) GetJournalById(ctx context.Context, journalId str
 		lLog.Errorf("error while calling GetJournal. got %s", err.Error())
 		return nil, err
 	}
+	if journal == nil {
+		lLog.Errorf("error while calling GetJournal, journal is NIL but not throw any error.")
+		return nil, fmt.Errorf("error while calling GetJournal, journal is NIL but not throw any error")
+	}
 	ret := &acccore.BaseJournal{}
 	ret.SetAmount(journal.TotalAmount).SetDescription(journal.Description).SetReversal(journal.IsReversal).
 		SetJournalingTime(journal.JournalingTime).SetCreateBy(journal.CreatedBy).SetCreateTime(journal.CreatedAt).

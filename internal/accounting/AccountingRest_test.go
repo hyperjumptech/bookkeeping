@@ -38,10 +38,11 @@ func TestRestAll(t *testing.T) {
 	ctx = context.WithValue(ctx, contextkeys.UserIDContextKey, "TESTING")
 
 	if testing.Short() {
+		t.Log("Running test in short mode")
 		accountManager = &acccore.InMemoryAccountManager{}
 		transactionManager = &acccore.InMemoryTransactionManager{}
 		journalManager = &acccore.InMemoryJournalManager{}
-		exchangeManager = &acccore.InMemoryExchangeManager{}
+		exchangeManager = acccore.NewInMemoryExchangeManager()
 		uniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
 			Length:        16,
 			LowerAlpha:    false,
@@ -51,6 +52,7 @@ func TestRestAll(t *testing.T) {
 		}
 		acccore.ClearInMemoryTables()
 	} else {
+		t.Log("Running test in normal mode")
 		config.GetInt("")
 		config.Set("db.host", "localhost")
 		config.Set("db.port", "6603")
@@ -240,7 +242,7 @@ type CreateAccountResponse struct {
 
 func MakeJournalTest(desc, accDebit, descDebit, accCredit, descCredit string, amount int64) func(t *testing.T) {
 	return func(t *testing.T) {
-		time.Sleep(1 * time.Second)
+		time.Sleep(1500 * time.Millisecond)
 		body := fmt.Sprintf(`
 {
   "description": "%s",

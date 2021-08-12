@@ -306,7 +306,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/FindAccountResponse"
+                  "$ref": "#/components/schemas/ListTransactionResponse"
                 }
               }
             }
@@ -1123,6 +1123,100 @@
           }
         }
       },
+      "ListTransactionItemsBody" : {
+        "description": "List transaction payload",
+        "type": "object",
+        "properties": {
+          "transaction_id" : {
+            "type": "string"
+          },
+          "transaction_time" : {
+            "type": "string"
+          },
+          "account_number" : {
+            "type": "string"
+          },
+          "journal_id" : {
+            "type": "string"
+          },
+          "description" : {
+            "type": "string"
+          },
+          "transaction_type" : {
+            "type": "string"
+          },
+          "amount" : {
+            "type": "number"
+          },
+          "account_balance" : {
+            "type": "number"
+          },
+          "create_time" : {
+            "type": "string"
+          },
+          "create_by" : {
+            "type": "string"
+          }
+        }
+      },
+      "ListTransactionResponse": {
+        "description": "FindAccount Response",
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseResponse"
+          }
+        ],
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "transactions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ListTransactionItemsBody"
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/PageResponse"
+              }
+            }
+          }
+        }
+      },
+      "ListAccountItemsBody" : {
+        "description": "Find Account payload",
+        "type": "object",
+        "required": ["name", "description", "coa", "currency","alignment","balance"],
+        "properties": {
+          "account_number": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coa": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "alignment": {
+            "enum" :[
+              "DEBIT",
+              "CREDIT"
+            ],
+            "default": "DEBIT",
+            "type": "string"
+          },
+          "balance": {
+            "type": "number"
+          }
+        }
+      },
       "CreateAccountBody": {
         "description": "CreateAccount payload",
         "type": "object",
@@ -1355,7 +1449,7 @@
               "accounts": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/CreateAccountBody"
+                  "$ref": "#/components/schemas/ListAccountItemsBody"
                 }
               },
               "pagination": {
@@ -1378,13 +1472,19 @@
           "description": {
             "type": "string"
           },
-          "total_amount": {
+          "amount": {
+            "type": "number"
+          },
+          "reversal": {
+            "type": "boolean"
+          },
+          "reversed_journal": {
             "type": "string"
           },
           "transactions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TransactionInfoWithId"
+              "$ref": "#/components/schemas/ListTransactionItemsBody"
             }
           }
         }

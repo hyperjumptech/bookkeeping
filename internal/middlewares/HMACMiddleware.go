@@ -24,7 +24,7 @@ func init() {
 
 func HMACMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if (len(r.URL.Path) >= 5 && r.URL.Path[:5] == "/docs") || r.URL.Path == "/health" || r.URL.Path == "/devkey" {
+		if (len(r.URL.Path) >= 5 && r.URL.Path[:5] == "/docs") || (len(r.URL.Path) >= 10 && r.URL.Path[:10] == "/dashboard") || r.URL.Path == "/health" || r.URL.Path == "/devkey" {
 			next.ServeHTTP(w, r)
 			return
 		}

@@ -326,8 +326,8 @@ func (repo *MySqlDBRepository) CountAccountByCoa(ctx context.Context, coa string
 func (repo *MySqlDBRepository) FindAccountByName(ctx context.Context, nameLike string, sort string, offset, length int) ([]*AccountRecord, error) {
 	lLog := mysqlLog.WithField("function", "FindAccountByName")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
-		" FROM accounts WHERE name LIKE ? AND is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
-	rows, err := repo.db.QueryxContext(ctx, q, nameLike, offset, length)
+		" FROM accounts WHERE (name LIKE ? OR account_number LIKE ?) AND is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
+	rows, err := repo.db.QueryxContext(ctx, q, nameLike, nameLike, offset, length)
 	if err != nil {
 		lLog.Errorf("error while finding accounts by name. got %s", err.Error())
 		return nil, err
@@ -352,8 +352,8 @@ func (repo *MySqlDBRepository) FindAccountByName(ctx context.Context, nameLike s
 func (repo *MySqlDBRepository) CountAccountByName(ctx context.Context, nameLike string) (int, error) {
 	lLog := mysqlLog.WithField("function", "CountAccountByName")
 	q := "SELECT COUNT(*) as accountCounts" +
-		" FROM accounts WHERE name LIKE ? AND is_deleted=false"
-	row := repo.db.QueryRowxContext(ctx, q, nameLike)
+		" FROM accounts WHERE (name LIKE ? OR account_number LIKE ?) AND is_deleted=false"
+	row := repo.db.QueryRowxContext(ctx, q, nameLike, nameLike)
 	if row.Err() != nil {
 		lLog.Errorf("error while counting account by name. got %s", row.Err().Error())
 		return 0, row.Err()
@@ -536,7 +536,7 @@ func (repo *MySqlDBRepository) GetJournal(ctx context.Context, journalID string)
 	err := row.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.IsReversal, &ar.ReversedJournalId, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, nil
+			return nil, err
 		}
 		lLog.Errorf("error while scanning listing row. got %s", err.Error())
 		return nil, err

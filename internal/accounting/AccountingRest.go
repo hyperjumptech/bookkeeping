@@ -72,6 +72,12 @@ type PaginatedResponse struct {
 	Pagination acccore.PageResult
 }
 
+// PaginatedResponse is the structure of stuff that requires pagination
+type TransactionListResponse struct {
+	Transactions []*TransactionListItem `json:"transactions"`
+	Pagination   acccore.PageResult     `json:"pagination"`
+}
+
 func DrawAccount(w http.ResponseWriter, r *http.Request) {
 	requestId := r.Context().Value(contextkeys.XRequestID).(string)
 	llog := restLog.WithField("RequestID", requestId).WithField("function", "ListTransactionByAccount")
@@ -307,11 +313,56 @@ func ListTransactionByAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp := &PaginatedResponse{
-		Items:      transactions,
-		Pagination: pr,
+	retTransac := make([]*TransactionListItem, len(transactions))
+	for idx, trx := range transactions {
+		align := "DEBIT"
+		if trx.GetAlignment() == acccore.CREDIT {
+			align = "CREDIT"
+		}
+		retTransac[idx] = &TransactionListItem{
+			TransactionId:   trx.GetTransactionID(),
+			TransactionTime: trx.GetTransactionTime().Format(time.RFC3339),
+			AccountNumber:   trx.GetAccountNumber(),
+			JournalId:       trx.GetJournalID(),
+			Description:     trx.GetDescription(),
+			TransactionType: align,
+			Amount:          trx.GetAmount(),
+			AccountBalance:  trx.GetAccountBalance(),
+			CreateTime:      trx.GetCreateTime().Format(time.RFC3339),
+			CreateBy:        trx.GetCreateBy(),
+		}
+	}
+
+	resp := &TransactionListResponse{
+		Transactions: retTransac,
+		Pagination:   pr,
 	}
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "transaction list", resp, 2)
+}
+
+type JournalDetail struct {
+	JournalId       string `json:"journal_id"`
+	JournalingTime  string `json:"journaling_time"`
+	Description     string `json:"description"`
+	Reversal        bool   `json:"reversal"`
+	ReversedJournal string `json:"reversed_journal"`
+	Amount          int64  `json:"amount"`
+	Transactions    []*TransactionListItem
+	CreateTime      string `json:"create_time"`
+	CreateBy        string `json:"create_by"`
+}
+
+type TransactionListItem struct {
+	TransactionId   string `json:"transaction_id"`
+	TransactionTime string `json:"transaction_time"`
+	AccountNumber   string `json:"account_number"`
+	JournalId       string `json:"journal_id"`
+	Description     string `json:"description"`
+	TransactionType string `json:"transaction_type"`
+	Amount          int64  `json:"amount"`
+	AccountBalance  int64  `json:"account_balance"`
+	CreateTime      string `json:"create_time"`
+	CreateBy        string `json:"create_by"`
 }
 
 type AccountResponseBody struct {
@@ -322,6 +373,16 @@ type AccountResponseBody struct {
 	Currency      string `json:"currency"`
 	Alignment     string `json:"alignment"`
 	Creator       string `json:"creator"`
+}
+
+type AccountItemsResponseBody struct {
+	AccountNumber string `json:"account_number"`
+	Name          string `json:"name"`
+	Description   string `json:"description"`
+	COA           string `json:"coa"`
+	Currency      string `json:"currency"`
+	Alignment     string `json:"alignment"`
+	Balance       int64  `json:"balance"`
 }
 
 func FromAccorePageResult(pr acccore.PageResult) *PageResultBody {
@@ -412,16 +473,17 @@ func FindAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accountSet := make([]*AccountResponseBody, 0)
+	accountSet := make([]*AccountItemsResponseBody, 0)
 	for _, acc := range accounts {
-		acci := &AccountResponseBody{
+		acci := &AccountItemsResponseBody{
 			AccountNumber: acc.GetAccountNumber(),
 			Name:          acc.GetName(),
 			Description:   acc.GetDescription(),
 			COA:           acc.GetCOA(),
 			Currency:      acc.GetCurrency(),
+
 			//Alignment:     "",
-			Creator: acc.GetCreateBy(),
+			Balance: acc.GetBalance(),
 		}
 		if acc.GetAlignment() == acccore.DEBIT {
 			acci.Alignment = "DEBIT"
@@ -432,8 +494,8 @@ func FindAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := &struct {
-		Accounts   []*AccountResponseBody `json:"accounts"`
-		Pagination *PageResultBody        `json:"pagination"`
+		Accounts   []*AccountItemsResponseBody `json:"accounts"`
+		Pagination *PageResultBody             `json:"pagination"`
 	}{
 		Accounts:   accountSet,
 		Pagination: FromAccorePageResult(pr),
@@ -521,7 +583,44 @@ func GetJournal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", j, 1)
+	reversedJournal := ""
+	if j.IsReversal() && j.GetReversedJournal() != nil {
+		reversedJournal = j.GetReversedJournal().GetJournalID()
+	}
+
+	retJournal := &JournalDetail{
+		JournalId:       j.GetJournalID(),
+		JournalingTime:  j.GetJournalingTime().Format(time.RFC3339),
+		Description:     j.GetDescription(),
+		Reversal:        j.IsReversal(),
+		ReversedJournal: reversedJournal,
+		Amount:          j.GetAmount(),
+		Transactions:    nil,
+		CreateTime:      j.GetCreateTime().Format(time.RFC3339),
+		CreateBy:        j.GetCreateBy(),
+	}
+	retTrxes := make([]*TransactionListItem, len(j.GetTransactions()))
+	for idx, trx := range j.GetTransactions() {
+		align := "DEBIT"
+		if trx.GetAlignment() == acccore.CREDIT {
+			align = "CREDIT"
+		}
+		retTrxes[idx] = &TransactionListItem{
+			TransactionId:   trx.GetTransactionID(),
+			TransactionTime: trx.GetTransactionTime().Format(time.RFC3339),
+			AccountNumber:   trx.GetAccountNumber(),
+			JournalId:       trx.GetJournalID(),
+			Description:     trx.GetDescription(),
+			TransactionType: align,
+			Amount:          trx.GetAmount(),
+			AccountBalance:  trx.GetAccountBalance(),
+			CreateTime:      trx.GetCreateTime().Format(time.RFC3339),
+			CreateBy:        trx.GetCreateBy(),
+		}
+	}
+	retJournal.Transactions = retTrxes
+
+	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", retJournal, 1)
 }
 
 func DrawJournal(w http.ResponseWriter, r *http.Request) {

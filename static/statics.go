@@ -14,7 +14,7 @@ var (
 	errFileNotFound = fmt.Errorf("file not found")
 )
 
-//go:embed api
+//go:embed api dashboard
 var fs embed.FS
 
 type FileData struct {
