@@ -215,7 +215,7 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 	if account.GetAlignment() == acccore.DEBIT {
 		ret.Alignment = "DEBIT"
 	} else {
-		ret.Alignment = "DEBIT"
+		ret.Alignment = "CREDIT"
 	}
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "account "+account.GetAccountNumber(), ret, 0)
 }
@@ -792,7 +792,7 @@ func CreateJournal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	helpers.HTTPResponseBuilder(journalContext, w, r, 200, "OK", journal.JournalID, 0)
-	return
+
 }
 
 func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
@@ -1153,6 +1153,11 @@ func CalculateExchange(w http.ResponseWriter, r *http.Request) {
 	}
 
 	amnt, err := strconv.Atoi(cAmt)
+	if err != nil {
+		llog.Error("error, couldn't convert the amount: ", cAmt)
+		helpers.HTTPResponseBuilder(r.Context(), w, r, http.StatusBadRequest, "path not valid", "path not valid", 400)
+		return
+	}
 
 	res, err := ExchangeMgr.CalculateExchange(r.Context(), cFrom, cTo, int64(amnt))
 	if err != nil {

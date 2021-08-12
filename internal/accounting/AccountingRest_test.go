@@ -5,6 +5,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"reflect"
+	"testing"
+	"time"
+	"unsafe"
+
 	"github.com/IDN-Media/awards/internal/config"
 	"github.com/IDN-Media/awards/internal/connector"
 	"github.com/IDN-Media/awards/internal/contextkeys"
@@ -13,12 +20,6 @@ import (
 	"github.com/hyperjumptech/acccore"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"net/http"
-	"net/http/httptest"
-	"reflect"
-	"testing"
-	"time"
-	"unsafe"
 )
 
 var (
@@ -141,10 +142,10 @@ func TestRestAll(t *testing.T) {
 		MakeCreateAccountTest("", "Budhi Point", "Budhi Point Account",
 			"1.2.2", "POINT", "DEBIT", "max", http.StatusOK, &BudhiPointAccountNo))
 	t.Run("Test Creating GoldCommit Accounts",
-		MakeCreateAccountTest("GOLDCOMMIT", "Gold Commited", "The total commitment of gold",
+		MakeCreateAccountTest("GOLDCOMMIT", "Gold Committed", "The total commitment of gold",
 			"2.1.1", "GOLD", "CREDIT", "max", http.StatusOK, &GoldCommitmentAccountNo))
 	t.Run("Test Creating PointCommit Accounts",
-		MakeCreateAccountTest("POINTCOMMIT", "Point Commited", "The total commitment of point",
+		MakeCreateAccountTest("POINTCOMMIT", "Point Committed", "The total commitment of point",
 			"2.2.1", "POINT", "CREDIT", "max", http.StatusOK, &PointCommitmentAccountNo))
 
 	t.Run("Test Listing Filled Accounts", RunningTestListAccountFilled)
@@ -191,7 +192,7 @@ type AccountIndividual struct {
 	Balance       int64  `json:"balance"`
 }
 type IndividualAccountResponse struct {
-	Message   string             `json:"message"'`
+	Message   string             `json:"message"`
 	Status    string             `json:"status"`
 	Data      *AccountIndividual `json:"data"`
 	ErrorCode int                `json:"error_code"`
@@ -228,13 +229,13 @@ type ListAccountItem struct {
 	Pagination *Pagination    `json:"pagination"`
 }
 type ListAccountResponse struct {
-	Message   string           `json:"message"'`
+	Message   string           `json:"message"`
 	Status    string           `json:"status"`
 	Data      *ListAccountItem `json:"data"`
 	ErrorCode int              `json:"error_code"`
 }
 type CreateAccountResponse struct {
-	Message   string `json:"message"'`
+	Message   string `json:"message"`
 	Status    string `json:"status"`
 	Data      string `json:"data"`
 	ErrorCode int    `json:"error_code"`
@@ -391,7 +392,7 @@ type ListCurrencyItem struct {
 }
 
 type ListCurrencyResponse struct {
-	Message   string              `json:"message"'`
+	Message   string              `json:"message"`
 	Status    string              `json:"status"`
 	Data      []*ListCurrencyItem `json:"data"`
 	ErrorCode int                 `json:"error_code"`
@@ -436,7 +437,7 @@ func RunningTestListCurrenciesContainsGoldPoint(t *testing.T) {
 }
 
 type CreateCurrencyResponse struct {
-	Message   string           `json:"message"'`
+	Message   string           `json:"message"`
 	Status    string           `json:"status"`
 	Data      ListCurrencyItem `json:"data"`
 	ErrorCode int              `json:"error_code"`
@@ -488,7 +489,7 @@ func RunningTestFetchIndividualCurrency(t *testing.T) {
 }
 
 type ExchangeDenominatorResponse struct {
-	Message   string  `json:"message"'`
+	Message   string  `json:"message"`
 	Status    string  `json:"status"`
 	Data      float64 `json:"data"`
 	ErrorCode int     `json:"error_code"`
