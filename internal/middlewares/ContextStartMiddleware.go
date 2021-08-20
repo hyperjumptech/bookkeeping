@@ -17,6 +17,10 @@ var (
 	}
 )
 
+// SetupContextMiddleware will check if the current request already contains a context or not
+// If it do not contain a context, a new context from background will be used and inserted into the request.
+// The context is then injected with XRequestID key taken from the request header (or a new request id if
+// theres no such header). This will be useful to chain the logs based on the request.
 func SetupContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rctx := r.Context()

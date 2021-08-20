@@ -91,6 +91,7 @@ func InitRoutes(router *Router) {
 	}
 }
 
+// StaticServer is a http handler used to serve all static endpoints such as docs and dashboard
 func StaticServer(path string) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {

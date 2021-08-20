@@ -22,6 +22,8 @@ func init() {
 	SecretKey = config.Get("hmac.secret")
 }
 
+// HMACMiddleware will handle the HMAC verification for each request of all
+// restricted endpoint.
 func HMACMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if (len(r.URL.Path) >= 5 && r.URL.Path[:5] == "/docs") || (len(r.URL.Path) >= 10 && r.URL.Path[:10] == "/dashboard") || r.URL.Path == "/health" || r.URL.Path == "/devkey" {
@@ -44,6 +46,8 @@ func HMACMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// ComputeHmac will calculate and create new HMAC-SHA256 string hash based on the
+// payload and the secret string
 func ComputeHmac(message string, secret string) string {
 	key := []byte(secret)
 	h := hmac.New(sha256.New, key)
@@ -51,6 +55,8 @@ func ComputeHmac(message string, secret string) string {
 	return base64.StdEncoding.EncodeToString(h.Sum(nil))
 }
 
+// GenHMAC will generate a new HMAC string using the current time in RFC3339 format
+// as payload .
 func GenHMAC() string {
 	time := time.Now().Format(time.RFC3339)
 	hash := ComputeHmac(time, SecretKey)
@@ -59,6 +65,9 @@ func GenHMAC() string {
 	return base64hmac
 }
 
+// ValidateHMAC will validate if a specific HMAC string is valid,
+// it will open the time payload and make sure the payload is not expired
+// and it equals to the hash
 func ValidateHMAC(hmac string) bool {
 	decode, err := base64.StdEncoding.DecodeString(hmac)
 	if err != nil {
@@ -106,9 +115,11 @@ func DevKey(w http.ResponseWriter, r *http.Request) {
 }
 
 const (
+	// RWords is a residual string used to mimic the actual HMAC
 	RWords = "ButImustexplaintoyouhowallthismistakenideaofdenouncingpleasureandpraisingpainwasbornandIwillgiveyouacompleteaccountofthesystemandexpoundtheactualteachingsofthegreatexplorerofthetruththemasterbuilderofhumanhappinessNoonerejectsdislikesoravoidspleasureitselfbecauseitispleasurebutbecausethosewhodonotknowhowtopursuepleasurerationallyencounterconsequencesthatareextremelypainfulNoragainisthereanyonewholovesorpursuesordesirestoobtainpainofitselfbecauseitispainbutbecauseoccasionallycircumstancesoccurinwhichtoilandpaincanprocurehimsomegreatpleasureTotakeatrivialexamplewhichofuseverundertakeslaboriousphysicalexerciseexcepttoobtainsomeadvantagefromitButwhohasanyrighttofindfaultwithamanwhochoosestoenjoyapleasurethathasnoannoyingconsequencesoronewhoavoidsapainthatproducesnoresultantpleasure"
 )
 
+// MakeResidue create a dummy HMAC
 func MakeResidue(hmac string) string {
 	l := len(hmac) - 2
 	off := len(RWords) - (len(hmac) - 2)

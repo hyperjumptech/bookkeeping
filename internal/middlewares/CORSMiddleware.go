@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// theCors object instance of cors.Cors
 	theCors *cors.Cors
 )
 
@@ -24,6 +25,7 @@ func init() {
 	})
 }
 
+// CORSMiddleware will handle CORS handling
 func CORSMiddleware(next http.Handler) http.Handler {
 	return theCors.Handler(next)
 }
