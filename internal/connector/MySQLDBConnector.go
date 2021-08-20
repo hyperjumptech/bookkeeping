@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/IDN-Media/awards/internal/contextkeys"
+	"html"
 	"time"
 
 	"github.com/IDN-Media/awards/errors"
@@ -132,10 +133,18 @@ func (repo *MySqlDBRepository) InsertAccount(ctx context.Context, rec *AccountRe
 		lLog.Errorf("UserContext Key %s is not in context", contextkeys.UserIDContextKey)
 		return "", errors.ErrUserContextKeyMissing
 	}
-	rec.UpdatedBy = theUser
+
+	rec.Alignment = html.EscapeString(rec.Alignment)
+	rec.AccountNumber = html.EscapeString(rec.AccountNumber)
+	rec.Name = html.EscapeString(rec.Name)
+	rec.Description = html.EscapeString(rec.Description)
+	rec.Coa = html.EscapeString(rec.Coa)
+	rec.CurrencyCode = html.EscapeString(rec.CurrencyCode)
+	rec.UpdatedBy = html.EscapeString(theUser)
 	rec.UpdatedAt = time.Now()
-	rec.CreatedBy = theUser
+	rec.CreatedBy = html.EscapeString(theUser)
 	rec.CreatedAt = time.Now()
+
 	q := "INSERT INTO accounts(" +
 		"account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by, is_deleted" +
 		") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false)"
@@ -185,7 +194,13 @@ func (repo *MySqlDBRepository) UpdateAccount(ctx context.Context, rec *AccountRe
 		lLog.Errorf("UserContext Key %s is not in context", contextkeys.UserIDContextKey)
 		return errors.ErrUserContextKeyMissing
 	}
-	rec.UpdatedBy = theUser
+
+	rec.Alignment = html.EscapeString(rec.Alignment)
+	rec.Name = html.EscapeString(rec.Name)
+	rec.Description = html.EscapeString(rec.Description)
+	rec.Coa = html.EscapeString(rec.Coa)
+	rec.CurrencyCode = html.EscapeString(rec.CurrencyCode)
+	rec.UpdatedBy = html.EscapeString(theUser)
 	rec.UpdatedAt = time.Now()
 	q := "UPDATE accounts set" +
 		" name=?, currency_code=?, description=?, alignment=?, balance=?, coa=?, created_at=?, created_by=?, updated_at=?, updated_by=?" +
@@ -327,7 +342,7 @@ func (repo *MySqlDBRepository) FindAccountByName(ctx context.Context, nameLike s
 	lLog := mysqlLog.WithField("function", "FindAccountByName")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
 		" FROM accounts WHERE (name LIKE ? OR account_number LIKE ?) AND is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
-	rows, err := repo.db.QueryxContext(ctx, q, nameLike, nameLike, offset, length)
+	rows, err := repo.db.QueryxContext(ctx, q, html.EscapeString(nameLike), html.EscapeString(nameLike), offset, length)
 	if err != nil {
 		lLog.Errorf("error while finding accounts by name. got %s", err.Error())
 		return nil, err
@@ -374,7 +389,7 @@ func (repo *MySqlDBRepository) GetAccount(ctx context.Context, accountNumber str
 	lLog := mysqlLog.WithField("function", "GetAccount")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
 		" FROM accounts WHERE account_number=? AND is_deleted=false"
-	row := repo.db.QueryRowxContext(ctx, q, accountNumber)
+	row := repo.db.QueryRowxContext(ctx, q, html.EscapeString(accountNumber))
 	if row.Err() != nil {
 		lLog.Errorf("error while retrieving account by account number. got %s", row.Err().Error())
 		return nil, row.Err()
@@ -422,7 +437,8 @@ func (repo *MySqlDBRepository) InsertJournal(ctx context.Context, rec *JournalRe
 		"journal_id, journaling_time, description, is_reversal, reversed_journal_id, total_amount, created_at, created_by, updated_at, updated_by, is_deleted" +
 		") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 	args := []interface{}{
-		rec.JournalID, rec.JournalingTime, rec.Description, rec.IsReversal, rec.ReversedJournalId, rec.TotalAmount, rec.CreatedAt, rec.CreatedBy, rec.CreatedAt, rec.CreatedBy, false,
+		html.EscapeString(rec.JournalID), rec.JournalingTime, html.EscapeString(rec.Description),
+		rec.IsReversal, html.EscapeString(rec.ReversedJournalId), rec.TotalAmount, rec.CreatedAt, html.EscapeString(rec.CreatedBy), rec.CreatedAt, html.EscapeString(rec.CreatedBy), false,
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -462,7 +478,7 @@ func (repo *MySqlDBRepository) UpdateJournal(ctx context.Context, rec *JournalRe
 		"set journaling_time=?, description=?, is_reversal=?, reversed_journal_id=?, total_amount=?, updated_at=?, updated_by=?" +
 		" WHERE journal_id=? AND is_deleted=false"
 	args := []interface{}{
-		rec.JournalingTime, rec.Description, rec.IsReversal, rec.ReversedJournalId, rec.TotalAmount, time.Now(), theUser, rec.JournalID,
+		rec.JournalingTime, html.EscapeString(rec.Description), rec.IsReversal, html.EscapeString(rec.ReversedJournalId), rec.TotalAmount, time.Now(), html.EscapeString(theUser), html.EscapeString(rec.JournalID),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -481,7 +497,7 @@ func (repo *MySqlDBRepository) DeleteJournal(ctx context.Context, journalID stri
 		"set is_deleted=true" +
 		" WHERE journal_id=? && is_deleted=true"
 	args := []interface{}{
-		journalID,
+		html.EscapeString(journalID),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -645,7 +661,16 @@ func (repo *MySqlDBRepository) InsertTransaction(ctx context.Context, rec *Trans
 		"transaction_id, transaction_time, account_number, journal_id, description, alignment, amount, balance, created_at, created_by, is_deleted" +
 		") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, false)"
 	args := []interface{}{
-		rec.TransactionID, rec.TransactionTime, rec.AccountNumber, rec.JournalID, rec.Description, rec.Alignment, rec.Amount, rec.Balance, rec.CreatedAt, rec.CreatedBy,
+		html.EscapeString(rec.TransactionID),
+		rec.TransactionTime,
+		html.EscapeString(rec.AccountNumber),
+		html.EscapeString(rec.JournalID),
+		html.EscapeString(rec.Description),
+		html.EscapeString(rec.Alignment),
+		rec.Amount,
+		rec.Balance,
+		rec.CreatedAt,
+		html.EscapeString(rec.CreatedBy),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -682,7 +707,16 @@ func (repo *MySqlDBRepository) UpdateTransaction(ctx context.Context, rec *Trans
 		"set transaction_time=?, account_number=?, journal_id=?, description=?, alignment=?, amount=?, balance=?, created_at=?, created_by=?" +
 		" WHERE journal_id=? and is_deleted=false"
 	args := []interface{}{
-		rec.TransactionTime, rec.AccountNumber, rec.JournalID, rec.Description, rec.Alignment, rec.Amount, rec.Balance, rec.CreatedAt, rec.CreatedBy, rec.JournalID,
+		rec.TransactionTime,
+		html.EscapeString(rec.AccountNumber),
+		html.EscapeString(rec.JournalID),
+		html.EscapeString(rec.Description),
+		html.EscapeString(rec.Alignment),
+		rec.Amount,
+		rec.Balance,
+		rec.CreatedAt,
+		html.EscapeString(rec.CreatedBy),
+		html.EscapeString(rec.JournalID),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -867,7 +901,12 @@ func (repo *MySqlDBRepository) InsertCurrency(ctx context.Context, rec *Currenci
 		"code, name, exchange, created_at, created_by, updated_at, updated_by, is_deleted" +
 		") VALUES(?, ?, ?, ?, ?, ?, ?, false)"
 	args := []interface{}{
-		rec.Code, rec.Name, rec.Exchange, rec.CreatedAt, rec.CreatedBy, rec.UpdatedAt, rec.UpdatedBy,
+		html.EscapeString(rec.Code),
+		html.EscapeString(rec.Name),
+		rec.Exchange, rec.CreatedAt,
+		html.EscapeString(rec.CreatedBy),
+		rec.UpdatedAt,
+		html.EscapeString(rec.UpdatedBy),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -901,7 +940,13 @@ func (repo *MySqlDBRepository) UpdateCurrency(ctx context.Context, rec *Currenci
 		"set name=?, exchange=?, created_at=?, created_by=?, updated_at=?, updated_by=?" +
 		" WHERE code=? AND is_deleted=false"
 	args := []interface{}{
-		rec.Name, rec.Exchange, rec.CreatedAt, rec.CreatedBy, rec.UpdatedAt, rec.UpdatedBy, rec.Code,
+		html.EscapeString(rec.Name),
+		rec.Exchange,
+		rec.CreatedAt,
+		html.EscapeString(rec.CreatedBy),
+		rec.UpdatedAt,
+		html.EscapeString(rec.UpdatedBy),
+		html.EscapeString(rec.Code),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
