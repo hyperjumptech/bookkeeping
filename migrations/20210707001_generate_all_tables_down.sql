@@ -1,4 +1,4 @@
-use devdb;
+use wallet;
 
 DROP TABLE accounts;
 DROP TABLE currencies;

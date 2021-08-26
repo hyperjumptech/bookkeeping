@@ -1,7 +1,7 @@
 #####################################################################
 # Azure pipeline : build dependency, unit test and publish
 # 
-# (c)2020 IDNMedia
+# (c)2021 hyperjumptech
 #################################################################### 
 parameters:
   - name: testPath

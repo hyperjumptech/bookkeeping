@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IDN-Media/awards/internal/connector"
-	"github.com/IDN-Media/awards/internal/contextkeys"
 	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/internal/connector"
+	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
 	"github.com/olekukonko/tablewriter"
 	"github.com/sirupsen/logrus"
 )

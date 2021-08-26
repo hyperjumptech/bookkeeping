@@ -4,13 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"github.com/IDN-Media/awards/internal/contextkeys"
 	"html"
 	"time"
 
-	"github.com/IDN-Media/awards/errors"
-	"github.com/IDN-Media/awards/internal/config"
+	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+
 	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/errors"
+	"github.com/hyperjumptech/hyperwallet/internal/config"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -18,14 +19,14 @@ var (
 	mysqlLog = log.WithField("file", "MySQLDBConnector.go")
 )
 
-// MySqlDBRepository is implementation of DBRepository specified for MySQL database
-type MySqlDBRepository struct {
+// MySQLDBRepository is implementation of DBRepository specified for MySQL database
+type MySQLDBRepository struct {
 	db        *sqlx.DB
 	connected bool
 }
 
 // ClearTables clear all table for testing purpose
-func (repo *MySqlDBRepository) ClearTables(ctx context.Context) error {
+func (repo *MySQLDBRepository) ClearTables(ctx context.Context) error {
 	lLog := mysqlLog.WithField("function", "ClearTables")
 	tablesToDrop := []string{"accounts", "currencies", "journals", "transactions"}
 	for _, t := range tablesToDrop {
@@ -39,7 +40,7 @@ func (repo *MySqlDBRepository) ClearTables(ctx context.Context) error {
 }
 
 // Connect connect the repository to the database, it uses the configuration internally for connection arguments and parameters.
-func (repo *MySqlDBRepository) Connect(ctx context.Context) error {
+func (repo *MySQLDBRepository) Connect(ctx context.Context) error {
 	lLog := mysqlLog.WithField("function", "Connect")
 
 	dbHost := config.Get("db.host")
@@ -70,7 +71,7 @@ func (repo *MySqlDBRepository) Connect(ctx context.Context) error {
 }
 
 // Disconnect the already establshed connection. Throws error if the underlying database connection yield an error
-func (repo *MySqlDBRepository) Disconnect() error {
+func (repo *MySQLDBRepository) Disconnect() error {
 	lLog := mysqlLog.WithField("function", "Disconnect")
 
 	defer func() {
@@ -85,7 +86,7 @@ func (repo *MySqlDBRepository) Disconnect() error {
 }
 
 // IsConnected check if the connection is already established
-func (repo *MySqlDBRepository) IsConnected() bool {
+func (repo *MySQLDBRepository) IsConnected() bool {
 	if repo.db == nil || !repo.connected {
 		return false
 	}
@@ -93,7 +94,7 @@ func (repo *MySqlDBRepository) IsConnected() bool {
 }
 
 // DB the database connection object.
-func (repo *MySqlDBRepository) DB() *sqlx.DB {
+func (repo *MySQLDBRepository) DB() *sqlx.DB {
 	return repo.db
 }
 
@@ -102,7 +103,7 @@ func (repo *MySqlDBRepository) DB() *sqlx.DB {
 // The rec argument contains the Account information to be written.
 // It returns the account number that written into database.
 // The AccountNumber contained within the rec MUST NOT be persisted before.
-func (repo *MySqlDBRepository) InsertAccount(ctx context.Context, rec *AccountRecord) (string, error) {
+func (repo *MySQLDBRepository) InsertAccount(ctx context.Context, rec *AccountRecord) (string, error) {
 	lLog := mysqlLog.WithField("function", "InsertAccount")
 
 	if len(rec.CurrencyCode) > 10 {
@@ -163,7 +164,7 @@ func (repo *MySqlDBRepository) InsertAccount(ctx context.Context, rec *AccountRe
 // Throws error if the underlying database connection has problem.
 // The rec argument contains the Account information to be updated.
 // The AccountNumber contained within the rec MUST be already persisted before.
-func (repo *MySqlDBRepository) UpdateAccount(ctx context.Context, rec *AccountRecord) error {
+func (repo *MySQLDBRepository) UpdateAccount(ctx context.Context, rec *AccountRecord) error {
 	lLog := mysqlLog.WithField("function", "UpdateAccount")
 
 	if len(rec.CurrencyCode) > 10 {
@@ -219,7 +220,7 @@ func (repo *MySqlDBRepository) UpdateAccount(ctx context.Context, rec *AccountRe
 // DeleteAccount soft/logical delete an account.
 // Throws error if the underlying database connection has problem.
 // If the account number not exist, it will do nothing and return nil.
-func (repo *MySqlDBRepository) DeleteAccount(ctx context.Context, accountNumber string) error {
+func (repo *MySQLDBRepository) DeleteAccount(ctx context.Context, accountNumber string) error {
 	lLog := mysqlLog.WithField("function", "DeleteAccount")
 	q := "UPDATE accounts " +
 		"set is_deleted=true" +
@@ -240,7 +241,7 @@ func (repo *MySqlDBRepository) DeleteAccount(ctx context.Context, accountNumber 
 // It will return AccountRecords sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of AcccountRecords
-func (repo *MySqlDBRepository) ListAccount(ctx context.Context, sort string, offset, length int) ([]*AccountRecord, error) {
+func (repo *MySQLDBRepository) ListAccount(ctx context.Context, sort string, offset, length int) ([]*AccountRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListAccount")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
 		" FROM accounts WHERE is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -267,7 +268,7 @@ func (repo *MySqlDBRepository) ListAccount(ctx context.Context, sort string, off
 // CountAccounts will return a number of accounts in database.
 // Throws error if the underlying database connection has problem.
 // It will returns total number of accounts in the database.
-func (repo *MySqlDBRepository) CountAccounts(ctx context.Context) (int, error) {
+func (repo *MySQLDBRepository) CountAccounts(ctx context.Context) (int, error) {
 	lLog := mysqlLog.WithField("function", "CountAccounts")
 	q := "SELECT COUNT(*) as accountCounts" +
 		" FROM accounts WHERE is_deleted=false"
@@ -289,7 +290,7 @@ func (repo *MySqlDBRepository) CountAccounts(ctx context.Context) (int, error) {
 // It will return AccountRecords sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of AcccountRecords
-func (repo *MySqlDBRepository) ListAccountByCoa(ctx context.Context, coa string, sort string, offset, length int) ([]*AccountRecord, error) {
+func (repo *MySQLDBRepository) ListAccountByCoa(ctx context.Context, coa string, sort string, offset, length int) ([]*AccountRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListAccountByCoa")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
 		" FROM accounts WHERE coa LIKE ? AND is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -315,7 +316,7 @@ func (repo *MySqlDBRepository) ListAccountByCoa(ctx context.Context, coa string,
 // CountAccountByCoa will return a number of accounts in database that belong to the specified COA number.
 // Throws error if the underlying database connection has problem.
 // It will returns total number of accounts in the database.
-func (repo *MySqlDBRepository) CountAccountByCoa(ctx context.Context, coa string) (int, error) {
+func (repo *MySQLDBRepository) CountAccountByCoa(ctx context.Context, coa string) (int, error) {
 	lLog := mysqlLog.WithField("function", "CountAccountByCoa")
 	q := "SELECT COUNT(*) as accountCounts" +
 		" FROM accounts WHERE coa LIKE ? AND is_deleted=false"
@@ -338,7 +339,7 @@ func (repo *MySqlDBRepository) CountAccountByCoa(ctx context.Context, coa string
 // It will return AccountRecords sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of AcccountRecords
-func (repo *MySqlDBRepository) FindAccountByName(ctx context.Context, nameLike string, sort string, offset, length int) ([]*AccountRecord, error) {
+func (repo *MySQLDBRepository) FindAccountByName(ctx context.Context, nameLike string, sort string, offset, length int) ([]*AccountRecord, error) {
 	lLog := mysqlLog.WithField("function", "FindAccountByName")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
 		" FROM accounts WHERE (name LIKE ? OR account_number LIKE ?) AND is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -364,7 +365,7 @@ func (repo *MySqlDBRepository) FindAccountByName(ctx context.Context, nameLike s
 // CountAccountByName will return a number of accounts in database that have the name like the specified in the argument..
 // Throws error if the underlying database connection has problem.
 // It will returns total number of accounts in the database.
-func (repo *MySqlDBRepository) CountAccountByName(ctx context.Context, nameLike string) (int, error) {
+func (repo *MySQLDBRepository) CountAccountByName(ctx context.Context, nameLike string) (int, error) {
 	lLog := mysqlLog.WithField("function", "CountAccountByName")
 	q := "SELECT COUNT(*) as accountCounts" +
 		" FROM accounts WHERE (name LIKE ? OR account_number LIKE ?) AND is_deleted=false"
@@ -385,7 +386,7 @@ func (repo *MySqlDBRepository) CountAccountByName(ctx context.Context, nameLike 
 // Throws error if  the underlying database connection has problem.
 // It returns an instance of AccountRecord or nil if there is no Account with
 // specified accountNumber.
-func (repo *MySqlDBRepository) GetAccount(ctx context.Context, accountNumber string) (*AccountRecord, error) {
+func (repo *MySQLDBRepository) GetAccount(ctx context.Context, accountNumber string) (*AccountRecord, error) {
 	lLog := mysqlLog.WithField("function", "GetAccount")
 	q := "SELECT account_number, name, currency_code, description, alignment, balance, coa, created_at, created_by, updated_at, updated_by" +
 		" FROM accounts WHERE account_number=? AND is_deleted=false"
@@ -410,7 +411,7 @@ func (repo *MySqlDBRepository) GetAccount(ctx context.Context, accountNumber str
 // will return error if the underlying database connection has problem. or if the
 // journalID, or Transaction ID in the journal already in the database.
 // Will return the JournalID saved if successful.
-func (repo *MySqlDBRepository) InsertJournal(ctx context.Context, rec *JournalRecord) (string, error) {
+func (repo *MySQLDBRepository) InsertJournal(ctx context.Context, rec *JournalRecord) (string, error) {
 	lLog := mysqlLog.WithField("function", "InsertJournal")
 
 	theUser, ok := ctx.Value(contextkeys.UserIDContextKey).(string)
@@ -423,8 +424,8 @@ func (repo *MySqlDBRepository) InsertJournal(ctx context.Context, rec *JournalRe
 		lLog.Errorf("JournalID %s is too long. Should not more than 20 digit", rec.JournalID)
 		return "", errors.ErrStringDataTooLong
 	}
-	if len(rec.ReversedJournalId) > 128 {
-		lLog.Errorf("Reversed journal id %s is too long. Should not more than 20 digit", rec.ReversedJournalId)
+	if len(rec.ReversedJournalID) > 128 {
+		lLog.Errorf("Reversed journal id %s is too long. Should not more than 20 digit", rec.ReversedJournalID)
 		return "", errors.ErrStringDataTooLong
 	}
 	if len(rec.CreatedBy) > 16 {
@@ -438,7 +439,7 @@ func (repo *MySqlDBRepository) InsertJournal(ctx context.Context, rec *JournalRe
 		") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
 	args := []interface{}{
 		html.EscapeString(rec.JournalID), rec.JournalingTime, html.EscapeString(rec.Description),
-		rec.IsReversal, html.EscapeString(rec.ReversedJournalId), rec.TotalAmount, rec.CreatedAt, html.EscapeString(rec.CreatedBy), rec.CreatedAt, html.EscapeString(rec.CreatedBy), false,
+		rec.IsReversal, html.EscapeString(rec.ReversedJournalID), rec.TotalAmount, rec.CreatedAt, html.EscapeString(rec.CreatedBy), rec.CreatedAt, html.EscapeString(rec.CreatedBy), false,
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -452,7 +453,7 @@ func (repo *MySqlDBRepository) InsertJournal(ctx context.Context, rec *JournalRe
 // Throws error if the underlying database connection has problem.
 // The rec argument contains the Journal information to be updated.
 // The JournalID contained within the rec MUST be already persisted before.
-func (repo *MySqlDBRepository) UpdateJournal(ctx context.Context, rec *JournalRecord) error {
+func (repo *MySQLDBRepository) UpdateJournal(ctx context.Context, rec *JournalRecord) error {
 	lLog := mysqlLog.WithField("function", "UpdateJournal")
 	theUser, ok := ctx.Value(contextkeys.UserIDContextKey).(string)
 	if !ok {
@@ -464,8 +465,8 @@ func (repo *MySqlDBRepository) UpdateJournal(ctx context.Context, rec *JournalRe
 		lLog.Errorf("JournalID %s is too long. Should not more than 20 digit", rec.JournalID)
 		return errors.ErrStringDataTooLong
 	}
-	if len(rec.ReversedJournalId) > 128 {
-		lLog.Errorf("Reversed journal id %s is too long. Should not more than 20 digit", rec.ReversedJournalId)
+	if len(rec.ReversedJournalID) > 128 {
+		lLog.Errorf("Reversed journal id %s is too long. Should not more than 20 digit", rec.ReversedJournalID)
 		return errors.ErrStringDataTooLong
 	}
 	if len(rec.CreatedBy) > 16 {
@@ -478,7 +479,7 @@ func (repo *MySqlDBRepository) UpdateJournal(ctx context.Context, rec *JournalRe
 		"set journaling_time=?, description=?, is_reversal=?, reversed_journal_id=?, total_amount=?, updated_at=?, updated_by=?" +
 		" WHERE journal_id=? AND is_deleted=false"
 	args := []interface{}{
-		rec.JournalingTime, html.EscapeString(rec.Description), rec.IsReversal, html.EscapeString(rec.ReversedJournalId), rec.TotalAmount, time.Now(), html.EscapeString(theUser), html.EscapeString(rec.JournalID),
+		rec.JournalingTime, html.EscapeString(rec.Description), rec.IsReversal, html.EscapeString(rec.ReversedJournalID), rec.TotalAmount, time.Now(), html.EscapeString(theUser), html.EscapeString(rec.JournalID),
 	}
 	_, err := repo.db.ExecContext(ctx, q, args...)
 	if err != nil {
@@ -491,7 +492,7 @@ func (repo *MySqlDBRepository) UpdateJournal(ctx context.Context, rec *JournalRe
 // DeleteJournal soft/logical delete an journal.
 // Throws error if the underlying database connection has problem.
 // If the JournalID not exist, it will do nothing and return nil.
-func (repo *MySqlDBRepository) DeleteJournal(ctx context.Context, journalID string) error {
+func (repo *MySQLDBRepository) DeleteJournal(ctx context.Context, journalID string) error {
 	lLog := mysqlLog.WithField("function", "DeleteJournal")
 	q := "UPDATE journals " +
 		"set is_deleted=true" +
@@ -512,7 +513,7 @@ func (repo *MySqlDBRepository) DeleteJournal(ctx context.Context, journalID stri
 // It will return JournalRecord sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of JournalRecord
-func (repo *MySqlDBRepository) ListJournal(ctx context.Context, sort string, offset, length int) ([]*JournalRecord, error) {
+func (repo *MySQLDBRepository) ListJournal(ctx context.Context, sort string, offset, length int) ([]*JournalRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListJournal")
 	q := "SELECT journal_id, journaling_time, description, is_reversal, reversed_journal_id, total_amount, created_at, created_by" +
 		" FROM journals WHERE is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -525,7 +526,7 @@ func (repo *MySqlDBRepository) ListJournal(ctx context.Context, sort string, off
 	ret := make([]*JournalRecord, 0)
 	for rows.Next() {
 		ar := &JournalRecord{}
-		err := rows.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.Description, &ar.IsReversal, &ar.ReversedJournalId, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
+		err := rows.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.Description, &ar.IsReversal, &ar.ReversedJournalID, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
 		if err != nil {
 			lLog.Errorf("error while scanning rows in ListAccount function. got %s", err.Error())
 		} else {
@@ -539,7 +540,7 @@ func (repo *MySqlDBRepository) ListJournal(ctx context.Context, sort string, off
 // Throws error if  the underlying database connection has problem.
 // It returns an instance of JournalRecord or nil if there is no Journal with
 // specified journalID.
-func (repo *MySqlDBRepository) GetJournal(ctx context.Context, journalID string) (*JournalRecord, error) {
+func (repo *MySQLDBRepository) GetJournal(ctx context.Context, journalID string) (*JournalRecord, error) {
 	lLog := mysqlLog.WithField("function", "GetJournal")
 	q := "SELECT  journal_id, journaling_time, description, is_reversal, reversed_journal_id, total_amount, created_at, created_by" +
 		" FROM journals WHERE journal_id=? AND is_deleted=false"
@@ -549,7 +550,7 @@ func (repo *MySqlDBRepository) GetJournal(ctx context.Context, journalID string)
 		return nil, row.Err()
 	}
 	ar := &JournalRecord{}
-	err := row.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.IsReversal, &ar.ReversedJournalId, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
+	err := row.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.IsReversal, &ar.ReversedJournalID, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, err
@@ -564,7 +565,7 @@ func (repo *MySqlDBRepository) GetJournal(ctx context.Context, journalID string)
 // Throws error if  the underlying database connection has problem.
 // It returns an instance of JournalRecord or nil if there is no Journal with
 // specified reversedJournalID.
-func (repo *MySqlDBRepository) GetJournalByReversalID(ctx context.Context, journalID string) (*JournalRecord, error) {
+func (repo *MySQLDBRepository) GetJournalByReversalID(ctx context.Context, journalID string) (*JournalRecord, error) {
 	lLog := mysqlLog.WithField("function", "GetJournalByReversalID")
 	q := "SELECT  journal_id, journaling_time, description, is_reversal, reversed_journal_id, total_amount, created_at, created_by" +
 		" FROM journals WHERE reversed_journal_id=? AND is_deleted=false"
@@ -574,7 +575,7 @@ func (repo *MySqlDBRepository) GetJournalByReversalID(ctx context.Context, journ
 		return nil, row.Err()
 	}
 	ar := &JournalRecord{}
-	err := row.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.Description, &ar.IsReversal, &ar.ReversedJournalId, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
+	err := row.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.Description, &ar.IsReversal, &ar.ReversedJournalID, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -590,7 +591,7 @@ func (repo *MySqlDBRepository) GetJournalByReversalID(ctx context.Context, journ
 // It will return JournalRecord sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of JournalRecord
-func (repo *MySqlDBRepository) ListJournalByTimeRange(ctx context.Context, timeFrom, timeTo time.Time, sort string, offset, length int) ([]*JournalRecord, error) {
+func (repo *MySQLDBRepository) ListJournalByTimeRange(ctx context.Context, timeFrom, timeTo time.Time, sort string, offset, length int) ([]*JournalRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListJournalByTimeRange")
 	q := "SELECT journal_id, journaling_time, description, is_reversal, reversed_journal_id, total_amount, created_at, created_by" +
 		" FROM journals WHERE journaling_time > ? AND journaling_time < ? AND is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -603,7 +604,7 @@ func (repo *MySqlDBRepository) ListJournalByTimeRange(ctx context.Context, timeF
 	ret := make([]*JournalRecord, 0)
 	for rows.Next() {
 		ar := &JournalRecord{}
-		err := rows.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.Description, &ar.IsReversal, &ar.ReversedJournalId, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
+		err := rows.Scan(&ar.JournalID, &ar.JournalingTime, &ar.Description, &ar.Description, &ar.IsReversal, &ar.ReversedJournalID, &ar.TotalAmount, &ar.CreatedAt, &ar.CreatedBy)
 		if err != nil {
 			lLog.Errorf("error while scanning rows in ListAccount function. got %s", err.Error())
 		} else {
@@ -616,7 +617,7 @@ func (repo *MySqlDBRepository) ListJournalByTimeRange(ctx context.Context, timeF
 // CountJournalByTimeRange will return a number of journals in database that been created within the time range.
 // Throws error if the underlying database connection has problem.
 // It will returns total number of journals in the database.
-func (repo *MySqlDBRepository) CountJournalByTimeRange(ctx context.Context, timeFrom, timeTo time.Time) (int, error) {
+func (repo *MySQLDBRepository) CountJournalByTimeRange(ctx context.Context, timeFrom, timeTo time.Time) (int, error) {
 	lLog := mysqlLog.WithField("function", "CountJournalByTimeRange")
 	q := "SELECT COUNT(*) as journalCount" +
 		" FROM journals WHERE journaling_time > ? AND journaling_time < ? AND is_deleted=false"
@@ -638,7 +639,7 @@ func (repo *MySqlDBRepository) CountJournalByTimeRange(ctx context.Context, time
 // will return error if the underlying database connection has problem. or if the
 // Transaction ID in the journal already in the database.
 // Will return the TransactionID saved if successful.
-func (repo *MySqlDBRepository) InsertTransaction(ctx context.Context, rec *TransactionRecord) (string, error) {
+func (repo *MySQLDBRepository) InsertTransaction(ctx context.Context, rec *TransactionRecord) (string, error) {
 	lLog := mysqlLog.WithField("function", "InsertTransaction")
 
 	if len(rec.TransactionID) > 20 {
@@ -684,7 +685,7 @@ func (repo *MySqlDBRepository) InsertTransaction(ctx context.Context, rec *Trans
 // Throws error if the underlying database connection has problem.
 // The rec argument contains the Transaction information to be updated.
 // The TransactionID contained within the rec MUST be already persisted before.
-func (repo *MySqlDBRepository) UpdateTransaction(ctx context.Context, rec *TransactionRecord) error {
+func (repo *MySQLDBRepository) UpdateTransaction(ctx context.Context, rec *TransactionRecord) error {
 	lLog := mysqlLog.WithField("function", "UpdateTransaction")
 
 	if len(rec.TransactionID) > 20 {
@@ -729,7 +730,7 @@ func (repo *MySqlDBRepository) UpdateTransaction(ctx context.Context, rec *Trans
 // DeleteTransaction soft/logical delete a transaction.
 // Throws error if the underlying database connection has problem.
 // If the TransactionID not exist, it will do nothing and return nil.
-func (repo *MySqlDBRepository) DeleteTransaction(ctx context.Context, transactionID string) error {
+func (repo *MySQLDBRepository) DeleteTransaction(ctx context.Context, transactionID string) error {
 	lLog := mysqlLog.WithField("function", "DeleteTransaction")
 	q := "UPDATE transactions " +
 		"set is_deleted=true" +
@@ -750,7 +751,7 @@ func (repo *MySqlDBRepository) DeleteTransaction(ctx context.Context, transactio
 // It will return TransactionRecord sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of TransactionRecord
-func (repo *MySqlDBRepository) ListTransaction(ctx context.Context, sort string, offset, length int) ([]*TransactionRecord, error) {
+func (repo *MySQLDBRepository) ListTransaction(ctx context.Context, sort string, offset, length int) ([]*TransactionRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListTransaction")
 	q := "SELECT transaction_id, transaction_time, account_number, journal_id, description, alignment, amount, balance, created_at, created_by" +
 		" FROM transactions WHERE is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -777,7 +778,7 @@ func (repo *MySqlDBRepository) ListTransaction(ctx context.Context, sort string,
 // Throws error if  the underlying database connection has problem.
 // It returns an instance of TransactionRecord  or nil if there is no Transaction with
 // specified transactionID.
-func (repo *MySqlDBRepository) GetTransaction(ctx context.Context, transactionID string) (*TransactionRecord, error) {
+func (repo *MySQLDBRepository) GetTransaction(ctx context.Context, transactionID string) (*TransactionRecord, error) {
 	lLog := mysqlLog.WithField("function", "GetTransaction")
 	q := "SELECT  transaction_id, transaction_time, account_number, journal_id, description, alignment, amount, balance, created_at, created_by" +
 		" FROM transactions WHERE transaction_id=? and is_deleted=false"
@@ -804,7 +805,7 @@ func (repo *MySqlDBRepository) GetTransaction(ctx context.Context, transactionID
 // It will return TransactionRecord sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of TransactionRecord
-func (repo *MySqlDBRepository) ListTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time, offset, length int) ([]*TransactionRecord, error) {
+func (repo *MySQLDBRepository) ListTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time, offset, length int) ([]*TransactionRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListTransactionByAccountNumber")
 	q := "SELECT transaction_id, transaction_time, account_number, journal_id, description, alignment, amount, balance, created_at, created_by" +
 		" FROM transactions WHERE account_number=? AND transaction_time > ? AND transaction_time < ? AND is_deleted=false ORDER BY transaction_time ASC LIMIT ?,?"
@@ -831,7 +832,7 @@ func (repo *MySqlDBRepository) ListTransactionByAccountNumber(ctx context.Contex
 // accountNumber andbeen created within the time range.
 // Throws error if the underlying database connection has problem.
 // It will returns total number of transaction in the database as specified in the argument.
-func (repo *MySqlDBRepository) CountTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time) (int, error) {
+func (repo *MySQLDBRepository) CountTransactionByAccountNumber(ctx context.Context, accountNumber string, timeFrom, timeTo time.Time) (int, error) {
 	lLog := mysqlLog.WithField("function", "CountTransactionByAccountNumber")
 	q := "SELECT COUNT(*) as trxCount" +
 		" FROM transactions WHERE account_number = ? AND transaction_time > ? AND transaction_time < ? AND is_deleted=false"
@@ -854,7 +855,7 @@ func (repo *MySqlDBRepository) CountTransactionByAccountNumber(ctx context.Conte
 // Throws error if the underlying database connection has problem.
 // It will return TransactionRecord sorted.
 // It returns list of TransactionRecord
-func (repo *MySqlDBRepository) ListTransactionByJournalID(ctx context.Context, journalID string) ([]*TransactionRecord, error) {
+func (repo *MySQLDBRepository) ListTransactionByJournalID(ctx context.Context, journalID string) ([]*TransactionRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListTransactionByJournalID")
 	q := "SELECT transaction_id, transaction_time, account_number, journal_id, description, alignment, amount, balance, created_at, created_by" +
 		" FROM transactions WHERE journal_id=? AND is_deleted=false"
@@ -881,7 +882,7 @@ func (repo *MySqlDBRepository) ListTransactionByJournalID(ctx context.Context, j
 // will return error if the underlying database connection has problem. or if the
 // Currency Code already in the database.
 // Will return the Currency Code saved if successful.
-func (repo *MySqlDBRepository) InsertCurrency(ctx context.Context, rec *CurrenciesRecord) (string, error) {
+func (repo *MySQLDBRepository) InsertCurrency(ctx context.Context, rec *CurrenciesRecord) (string, error) {
 	lLog := mysqlLog.WithField("function", "InsertCurrency")
 	if len(rec.Code) > 10 {
 		lLog.Errorf("Currency code %s is too long. Should not more than 10 digit", rec.Code)
@@ -920,7 +921,7 @@ func (repo *MySqlDBRepository) InsertCurrency(ctx context.Context, rec *Currenci
 // Throws error if the underlying database connection has problem.
 // The rec argument contains the Currency information to be updated.
 // The Currency Code contained within the rec MUST be already persisted before.
-func (repo *MySqlDBRepository) UpdateCurrency(ctx context.Context, rec *CurrenciesRecord) error {
+func (repo *MySQLDBRepository) UpdateCurrency(ctx context.Context, rec *CurrenciesRecord) error {
 	lLog := mysqlLog.WithField("function", "UpdateCurrency")
 	if len(rec.Code) > 10 {
 		lLog.Errorf("Currency code %s is too long. Should not more than 10 digit", rec.Code)
@@ -959,7 +960,7 @@ func (repo *MySqlDBRepository) UpdateCurrency(ctx context.Context, rec *Currenci
 // DeleteCurrency soft/logical delete a currency entity.
 // Throws error if the underlying database connection has problem.
 // If the Currency Code not exist, it will do nothing and return nil.
-func (repo *MySqlDBRepository) DeleteCurrency(ctx context.Context, currencyCode string) error {
+func (repo *MySQLDBRepository) DeleteCurrency(ctx context.Context, currencyCode string) error {
 	lLog := mysqlLog.WithField("function", "DeleteCurrency")
 	q := "UPDATE currencies " +
 		"set is_deleted=true" +
@@ -980,7 +981,7 @@ func (repo *MySqlDBRepository) DeleteCurrency(ctx context.Context, currencyCode 
 // It will return CurrenciesRecord sorted, starting from the offset with total maximum number or item, specified
 // in the length argument.
 // It returns list of CurrenciesRecord
-func (repo *MySqlDBRepository) ListCurrency(ctx context.Context, sort string, offset, length int) ([]*CurrenciesRecord, error) {
+func (repo *MySQLDBRepository) ListCurrency(ctx context.Context, sort string, offset, length int) ([]*CurrenciesRecord, error) {
 	lLog := mysqlLog.WithField("function", "ListCurrency")
 	q := "SELECT code, name, exchange, created_at, created_by, updated_at, updated_by" +
 		" FROM currencies WHERE is_deleted=false ORDER BY " + sort + " ASC LIMIT ?,?"
@@ -1006,7 +1007,7 @@ func (repo *MySqlDBRepository) ListCurrency(ctx context.Context, sort string, of
 // GetCurrency retrieves an Currency Record from database where the code is specified.
 // Throws error if  the underlying database connection has problem.
 // It returns an instance of CurrenciesRecord or nil if record not found
-func (repo *MySqlDBRepository) GetCurrency(ctx context.Context, code string) (*CurrenciesRecord, error) {
+func (repo *MySQLDBRepository) GetCurrency(ctx context.Context, code string) (*CurrenciesRecord, error) {
 	lLog := mysqlLog.WithField("function", "GetCurrency")
 	q := "SELECT  code, name, exchange, created_at, created_by, updated_at, updated_by" +
 		" FROM currencies WHERE code=? AND is_deleted=false"

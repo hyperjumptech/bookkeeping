@@ -5,16 +5,19 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
-	"github.com/IDN-Media/awards/internal/config"
 	"math/rand"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/hyperjumptech/hyperwallet/internal/config"
 )
 
 var (
+	// HMACAgeMinutes holds the validity (in minutes) of the hmac
 	HMACAgeMinutes int
-	SecretKey      string
+	// SecretKey holds the hmac secret
+	SecretKey string
 )
 
 func init() {
@@ -85,10 +88,7 @@ func ValidateHMAC(hmac string) bool {
 	}
 
 	signature := ComputeHmac(timeStr, SecretKey)
-	if signature64 != signature {
-		return false
-	}
-	return true
+	return signature64 == signature
 }
 
 // DevKey can be invoked from curl -X PUT -H "HocusPocus: AvadaCadavra" http://localhost:50051/devkey

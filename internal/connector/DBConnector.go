@@ -51,8 +51,8 @@ type JournalRecord struct {
 	Description string
 	// IsReversal related to is_reversal column
 	IsReversal bool
-	// ReversedJournalId related to reversed_jounal_id column
-	ReversedJournalId string
+	// ReversedJournalID related to reversed_jounal_id column
+	ReversedJournalID string
 	// TotalAmount related to total_amount column
 	TotalAmount int64
 	// CreatedAt related to created_at column

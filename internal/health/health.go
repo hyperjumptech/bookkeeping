@@ -6,8 +6,8 @@ import (
 
 	gosundheit "github.com/AppsFlyer/go-sundheit"
 	"github.com/AppsFlyer/go-sundheit/checks"
-	"github.com/IDN-Media/awards/internal/config"
-	"github.com/IDN-Media/awards/internal/connector"
+	"github.com/hyperjumptech/hyperwallet/internal/config"
+	"github.com/hyperjumptech/hyperwallet/internal/connector"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,7 +19,7 @@ var (
 )
 
 // InitializeHealthCheck initializes health monitors
-func InitializeHealthCheck(ctx context.Context, repo *connector.MySqlDBRepository) error {
+func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepository) error {
 	logf := healthLog.WithField("fn", "InitializeHealthCheck")
 
 	if ctx.Err() != nil {

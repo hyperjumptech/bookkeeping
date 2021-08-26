@@ -1,7 +1,7 @@
-# awards makefile
+# hyperwallet makefile
 
 CURRENT_PATH ?= $(shell pwd)
-IMAGE_NAME ?= awards-go-img
+IMAGE_NAME ?= hyperwallet-go-img
 
 .PHONY: all test clean build docker
 

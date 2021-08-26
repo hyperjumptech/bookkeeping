@@ -2,13 +2,14 @@ package accounting
 
 import (
 	"context"
-	"github.com/IDN-Media/awards/internal/config"
-	"github.com/IDN-Media/awards/internal/connector"
-	"github.com/IDN-Media/awards/internal/contextkeys"
-	"github.com/hyperjumptech/acccore"
 	"math/big"
 	"testing"
 	"time"
+
+	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/internal/config"
+	"github.com/hyperjumptech/hyperwallet/internal/connector"
+	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
 )
 
 func TestAccounting_CreateNewAccount(t *testing.T) {
@@ -42,7 +43,7 @@ func TestAccounting_CreateNewAccount(t *testing.T) {
 		config.Set("db.password", "devuser")
 		config.Set("db.name", "devdb")
 
-		repo := &connector.MySqlDBRepository{}
+		repo := &connector.MySQLDBRepository{}
 		err := repo.Connect(ctx)
 		if err != nil {
 			t.Errorf("cannot connect to db. got %s", err.Error())
@@ -134,7 +135,7 @@ func TestAccounting_CreateNewJournal(t *testing.T) {
 		config.Set("db.password", "devuser")
 		config.Set("db.name", "devdb")
 
-		repo := &connector.MySqlDBRepository{}
+		repo := &connector.MySQLDBRepository{}
 		err := repo.Connect(ctx)
 		if err != nil {
 			t.Errorf("cannot connect to db. got %s", err.Error())
@@ -232,7 +233,7 @@ func TestAccounting_CreateNewJournal(t *testing.T) {
 	}
 	t.Log(acc.GetJournalManager().RenderJournal(ctx, journal))
 
-	pr, trxs, err := acc.GetTransactionManager().ListTransactionsOnAccount(ctx, time.Now().Add(-2*time.Hour), time.Now().Add(2*time.Hour), goldLoan, acccore.PageRequest{
+	pr, trxs, _ := acc.GetTransactionManager().ListTransactionsOnAccount(ctx, time.Now().Add(-2*time.Hour), time.Now().Add(2*time.Hour), goldLoan, acccore.PageRequest{
 		PageNo:   1,
 		ItemSize: 10,
 		Sorts:    nil,

@@ -1,15 +1,16 @@
 package router
 
 import (
-	"github.com/IDN-Media/awards/internal/accounting"
-	"github.com/IDN-Media/awards/internal/middlewares"
-	"github.com/IDN-Media/awards/static"
 	"net/http"
 	"strings"
 
+	"github.com/hyperjumptech/hyperwallet/internal/accounting"
+	"github.com/hyperjumptech/hyperwallet/internal/middlewares"
+	"github.com/hyperjumptech/hyperwallet/static"
+
 	healthhttp "github.com/AppsFlyer/go-sundheit/http"
-	"github.com/IDN-Media/awards/internal/health"
 	"github.com/gorilla/mux"
+	"github.com/hyperjumptech/hyperwallet/internal/health"
 	log "github.com/sirupsen/logrus"
 )
 

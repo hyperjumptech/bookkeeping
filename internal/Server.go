@@ -9,15 +9,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/IDN-Media/awards/internal/accounting"
 	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/internal/accounting"
 
-	"github.com/IDN-Media/awards/internal/config"
-	"github.com/IDN-Media/awards/internal/connector"
-	"github.com/IDN-Media/awards/internal/health"
-	"github.com/IDN-Media/awards/internal/logger"
-	"github.com/IDN-Media/awards/internal/router"
 	"github.com/gorilla/mux"
+	"github.com/hyperjumptech/hyperwallet/internal/config"
+	"github.com/hyperjumptech/hyperwallet/internal/connector"
+	"github.com/hyperjumptech/hyperwallet/internal/health"
+	"github.com/hyperjumptech/hyperwallet/internal/logger"
+	"github.com/hyperjumptech/hyperwallet/internal/router"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -62,7 +62,7 @@ func InitializeServer() error {
 	appRouter.Router = mux.NewRouter()
 
 	// setup db connection
-	dbRepo = &connector.MySqlDBRepository{}
+	dbRepo = &connector.MySQLDBRepository{}
 	err := dbRepo.Connect(ctx)
 	if err != nil {
 		logf.Fatal("could not connect to db. Error: ", err)
@@ -81,7 +81,7 @@ func InitializeServer() error {
 	}
 
 	// setup health monitoring
-	err = health.InitializeHealthCheck(ctx, dbRepo.(*connector.MySqlDBRepository))
+	err = health.InitializeHealthCheck(ctx, dbRepo.(*connector.MySQLDBRepository))
 	if err != nil {
 		logf.Warn("health monitor error: ", err)
 	}

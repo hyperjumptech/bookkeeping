@@ -1,5 +1,6 @@
 package contextkeys
 
+// ContextKeys is a context key
 type ContextKeys string
 
 const (

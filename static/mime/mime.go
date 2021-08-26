@@ -703,15 +703,15 @@ var (
 	}
 )
 
-// MimeForFileName utility mimetype lokup
-func MimeForFileName(filename string) (string, error) {
+// ForFileName utility mimetype lokup
+func ForFileName(filename string) (string, error) {
 	reg := regexp.MustCompile(`[a-zA-Z0-9]+$`)
 	if reg.MatchString(filename) {
 		ext := reg.FindString(filename)
-		return MimeForExtension(ext)
-	} else {
-		return "", fmt.Errorf("can not find extension of file : %s", filename)
+		return ForExtension(ext)
 	}
+	return "", fmt.Errorf("can not find extension of file : %s", filename)
+
 }
 
 // IsPrintableChar checks if a type is printable
@@ -720,9 +720,9 @@ func IsPrintableChar(char byte) bool {
 		return false
 	} else if char >= 0x20 || char == 0x09 || char == 0x0A || char == 0x0D || char == 239 {
 		return true
-	} else {
-		return false
 	}
+	return false
+
 }
 
 // IsAllPrintableChar checks for the printable chars
@@ -736,12 +736,11 @@ func IsAllPrintableChar(bytes []byte) bool {
 	return float64(nonprintable)/float64(len(bytes)) < 0.03
 }
 
-// MimeForExtension lookup short code to string extensions
-func MimeForExtension(extension string) (string, error) {
+// ForExtension lookup short code to string extensions
+func ForExtension(extension string) (string, error) {
 	ex := strings.ToLower(extension)
 	if typ, ok := mimeMap[ex]; ok {
 		return typ, nil
-	} else {
-		return "", fmt.Errorf("no mime type for extension : %s", extension)
 	}
+	return "", fmt.Errorf("no mime type for extension : %s", extension)
 }

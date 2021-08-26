@@ -287,6 +287,6 @@ $RECYCLE.BIN/
 *.lnk
 
 ### ignore images
-awards-go-img
+ hyperwallet-go-img
 
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,git

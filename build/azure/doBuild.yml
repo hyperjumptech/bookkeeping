@@ -1,11 +1,11 @@
 #####################################################
 # azure build step (template)
-# (c)2021 IDNMedia
+# (c)2021 hyperjumptech
 #####################################################
 parameters:
   - name: imageName
     type: string
-    default: 'idn-media-img'
+    default: 'wallet-go-img'
   - name: path
     type: string
     default: './...'

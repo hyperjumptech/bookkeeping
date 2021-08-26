@@ -1,89 +1,42 @@
-#############################
-# BUILDing the docker image
-#############################
-FROM golang:1.14.13-buster as builder
-LABEL maintainer="https://github.com/IDN-Media"
+FROM golang:alpine as builder
+LABEL maintainer="https://github.com/hyperjumptech/hyperwallet"
 
-ENV GOOS=linux \
+ENV CGO_ENABLED=0 \
+    GOOS=linux \
     GOARCH=amd64 
 
 WORKDIR /build
-
-# Set timezone
-RUN echo Asia/Jakarta > /etc/timezone && \
-    rm /etc/localtime && \
-    ln -snf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
 
 # Create appuser.
 ENV USER=appuser
 ENV UID=10001 
 # See https://stackoverflow.com/a/55757473/12429735RUN 
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
-    --uid "${UID}" \
+RUN adduser \    
+    --disabled-password \    
+    --gecos "" \    
+    --home "/nonexistent" \    
+    --shell "/sbin/nologin" \    
+    --no-create-home \    
+    --uid "${UID}" \    
     "${USER}"
 
-RUN apt-get update && apt-get -y dist-upgrade
-
-RUN apt-get -y install \
-    build-essential \
-    libssl-dev \
-    ca-certificates
-
-RUN apt-get clean && apt-get -y autoremove && \
-    rm -rf /tmp/* /var/tmp/* 
-
 COPY . .
+RUN go mod tidy
+RUN go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o seed-go-img cmd/Main.go
 
-#RUN go build
-RUN go build -ldflags "-s -w" -o /build/awards.idn.media.app cmd/Main.go
 
 #############################
 # CREATE the runtime 
 #############################
-FROM debian:buster-slim
-
-# Set working directory
-WORKDIR /app
-
-# Set timezone
-RUN echo Asia/Jakarta > /etc/timezone && \
-    rm /etc/localtime && \
-    ln -snf /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
-    dpkg-reconfigure -f noninteractive tzdata
-
-# Copy user
+FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
-# Install dependencies
-RUN apt-get update && apt-get -y install \
-    libssl-dev \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Cleanup
-RUN apt-get clean && apt-get -y autoremove && \
-    rm -rf /tmp/* /var/tmp/* 
-
-# Copy executable file
-COPY --from=builder --chown=appuser:appuser /build/awards.idn.media.app /app/
-
-# Change directory permission
-
-RUN chown -R appuser:appuser /app/
+COPY --from=builder /build/wallet-go-img /app/
+WORKDIR /app
 
 # Use an unprivileged user.
 USER appuser:appuser
+EXPOSE 7000
 
-
-# Bind host from any ip
-ENV SERVER_HOST=0.0.0.0
-# Expose port
-EXPOSE 50051
-CMD ["/app/awards.idn.media.app"]
+CMD ["/app/wallet-go-img"]

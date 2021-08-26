@@ -1,4 +1,4 @@
-use devdb;
+use wallet;
 
 CREATE TABLE accounts (
   `account_number` VARCHAR(20) NOT NULL,

@@ -1,50 +1,33 @@
 #####################################################
 # azure build Docker steps (template)
-# (c)2021 IDNMedia
+# (c)2021 hyperjumptech
 #####################################################
 parameters:
+  - name: displayName
+    type: string
+    default: 'Build Docker Image'
+  - name: containerRegistry
+    type: string
+    default: 'dockerHub'
+  - name: dockerRepository
+    type: string
+    default: 'hyperjump/hyperwallet-go-img'    
   - name: dockerCommand
     type: string
     default: 'build'
-  - name: dockerRepository
-    type: string
-    default: 'idnmedia/go/livestream'
-  - name: dockerfile
+  - name: dockerFile
     type: string
     default: 'Dockerfile'
-    
-  - name: containerRegistry
-    type: string
-    default: 'mbakmia-registry'
   - name: tag
     type: string
-    default: 'development'
-  - name: tagSourceBranch
-    type: string
-    default: $(Build.SourceBranchName)
-
-  - name: displayName
-    type: string
-    default: 'Build Docker Image'    
+    default: 'latest'
 
 steps:
-    - bash: |
-        set -ex
-        tag=$(Build.SourceBranchName)
-        echo "##vso[task.setvariable variable=tag;]${{parameters.tag}}"
-        echo $tag
-      env:
-        tag: ${{ parameters.tag }}
-      displayName: 'Set Tag to $(Build.SourceBranchName)'
-
-    - task: Docker@2
-      displayName: ${{ parameters.displayName }}
-      inputs:
-        containerRegistry: ${{ parameters.containerRegistry }}
-        repository: ${{ parameters.dockerRepository }}
-        command: ${{ parameters.dockerCommand }}
-        Dockerfile: ${{ parameters.dockerfile }}
-        tags: |
-          ${{ parameters.tag }}
-          ${{ parameters.tagSourceBranch }}
-
+  - task: Docker@2
+    displayName: ${{ parameters.displayName }}
+    inputs:
+      containerRegistry: ${{ parameters.containerRegistry}}
+      repository: ${{ parameters.dockerRepository }}
+      command: ${{ parameters.dockerCommand }}
+      Dockerfile: ${{ parameters.dockerFile }}
+      tags: ${{ parameters.tag }}

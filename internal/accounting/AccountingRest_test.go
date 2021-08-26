@@ -12,12 +12,12 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/IDN-Media/awards/internal/config"
-	"github.com/IDN-Media/awards/internal/connector"
-	"github.com/IDN-Media/awards/internal/contextkeys"
-	"github.com/IDN-Media/awards/internal/middlewares"
 	"github.com/gorilla/mux"
 	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/internal/config"
+	"github.com/hyperjumptech/hyperwallet/internal/connector"
+	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/hyperjumptech/hyperwallet/internal/middlewares"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
@@ -61,7 +61,7 @@ func TestRestAll(t *testing.T) {
 		config.Set("db.password", "devuser")
 		config.Set("db.name", "devdb")
 
-		repo := &connector.MySqlDBRepository{}
+		repo := &connector.MySQLDBRepository{}
 		assert.NoError(t, repo.Connect(ctx))
 		assert.NoError(t, repo.ClearTables(ctx))
 

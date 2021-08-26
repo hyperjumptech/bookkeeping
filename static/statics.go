@@ -2,26 +2,24 @@ package static
 
 import (
 	"embed"
-	"fmt"
-	"github.com/IDN-Media/awards/static/mime"
-	"github.com/sirupsen/logrus"
 	"net/http"
 	"os"
 	"strings"
-)
 
-var (
-	errFileNotFound = fmt.Errorf("file not found")
+	"github.com/hyperjumptech/hyperwallet/static/mime"
+	"github.com/sirupsen/logrus"
 )
 
 //go:embed api dashboard
 var fs embed.FS
 
+// FileData is a file data structure
 type FileData struct {
 	Bytes       []byte
 	ContentType string
 }
 
+// IsDir checks if path is a dir
 func IsDir(path string) bool {
 	for _, s := range GetPathTree("static") {
 		if s == "[DIR]"+path {
@@ -31,6 +29,7 @@ func IsDir(path string) bool {
 	return false
 }
 
+// GetPathTree builds ta tree from the path
 func GetPathTree(path string) []string {
 	logrus.Infof("Into %s", path)
 	var entries []os.DirEntry
@@ -56,12 +55,13 @@ func GetPathTree(path string) []string {
 	return ret
 }
 
+// GetFile returns the file from a given path
 func GetFile(path string) (*FileData, error) {
 	bytes, err := fs.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	mimeType, err := mime.MimeForFileName(path)
+	mimeType, err := mime.ForFileName(path)
 	if err != nil {
 		return &FileData{
 			Bytes:       bytes,

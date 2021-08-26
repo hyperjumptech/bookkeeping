@@ -3,7 +3,7 @@ package logger
 import (
 	"strings"
 
-	"github.com/IDN-Media/awards/internal/config"
+	"github.com/hyperjumptech/hyperwallet/internal/config"
 	log "github.com/sirupsen/logrus"
 )
 

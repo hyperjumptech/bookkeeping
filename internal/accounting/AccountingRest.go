@@ -13,9 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/IDN-Media/awards/internal/contextkeys"
-	"github.com/IDN-Media/awards/internal/helpers"
 	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/hyperjumptech/hyperwallet/internal/helpers"
 	"github.com/sirupsen/logrus"
 )
 
@@ -72,15 +72,16 @@ type PaginatedResponse struct {
 	Pagination acccore.PageResult
 }
 
-// PaginatedResponse is the structure of stuff that requires pagination
+// TransactionListResponse is the structure response
 type TransactionListResponse struct {
 	Transactions []*TransactionListItem `json:"transactions"`
 	Pagination   acccore.PageResult     `json:"pagination"`
 }
 
+// DrawAccount draws the account activity
 func DrawAccount(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "ListTransactionByAccount")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "ListTransactionByAccount")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -178,8 +179,8 @@ func DrawAccount(w http.ResponseWriter, r *http.Request) {
 
 // GetAccount is the controller to handle retrieval of single account
 func GetAccount(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "GetAccount")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "GetAccount")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -220,9 +221,10 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "account "+account.GetAccountNumber(), ret, 0)
 }
 
+// ListTransactionByAccount lists transactions given an account
 func ListTransactionByAccount(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "ListTransactionByAccount")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "ListTransactionByAccount")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -320,10 +322,10 @@ func ListTransactionByAccount(w http.ResponseWriter, r *http.Request) {
 			align = "CREDIT"
 		}
 		retTransac[idx] = &TransactionListItem{
-			TransactionId:   trx.GetTransactionID(),
+			TransactionID:   trx.GetTransactionID(),
 			TransactionTime: trx.GetTransactionTime().Format(time.RFC3339),
 			AccountNumber:   trx.GetAccountNumber(),
-			JournalId:       trx.GetJournalID(),
+			JournalID:       trx.GetJournalID(),
 			Description:     trx.GetDescription(),
 			TransactionType: align,
 			Amount:          trx.GetAmount(),
@@ -340,8 +342,9 @@ func ListTransactionByAccount(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "transaction list", resp, 2)
 }
 
+// JournalDetail is the journal detail struct
 type JournalDetail struct {
-	JournalId       string `json:"journal_id"`
+	JournalID       string `json:"journal_id"`
 	JournalingTime  string `json:"journaling_time"`
 	Description     string `json:"description"`
 	Reversal        bool   `json:"reversal"`
@@ -352,11 +355,12 @@ type JournalDetail struct {
 	CreateBy        string `json:"create_by"`
 }
 
+// TransactionListItem is the transaction detail
 type TransactionListItem struct {
-	TransactionId   string `json:"transaction_id"`
+	TransactionID   string `json:"transaction_id"`
 	TransactionTime string `json:"transaction_time"`
 	AccountNumber   string `json:"account_number"`
-	JournalId       string `json:"journal_id"`
+	JournalID       string `json:"journal_id"`
 	Description     string `json:"description"`
 	TransactionType string `json:"transaction_type"`
 	Amount          int64  `json:"amount"`
@@ -365,6 +369,7 @@ type TransactionListItem struct {
 	CreateBy        string `json:"create_by"`
 }
 
+// AccountResponseBody with the account details
 type AccountResponseBody struct {
 	AccountNumber string `json:"account_number"`
 	Name          string `json:"name"`
@@ -375,6 +380,7 @@ type AccountResponseBody struct {
 	Creator       string `json:"creator"`
 }
 
+// AccountItemsResponseBody response for account items
 type AccountItemsResponseBody struct {
 	AccountNumber string `json:"account_number"`
 	Name          string `json:"name"`
@@ -385,6 +391,7 @@ type AccountItemsResponseBody struct {
 	Balance       int64  `json:"balance"`
 }
 
+// FromAccorePageResult returns the pagination detail
 func FromAccorePageResult(pr acccore.PageResult) *PageResultBody {
 	return &PageResultBody{
 		RequestPage:  pr.Request.PageNo,
@@ -405,6 +412,7 @@ func FromAccorePageResult(pr acccore.PageResult) *PageResultBody {
 	}
 }
 
+// PageResultBody is the pagination payload
 type PageResultBody struct {
 	RequestPage  int  `json:"request_page"`
 	RequestSize  int  `json:"request_size"`
@@ -423,9 +431,10 @@ type PageResultBody struct {
 	Offset       int  `json:"offset"`
 }
 
+// FindAccount searches for a given account id
 func FindAccount(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "FindAccount")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "FindAccount")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -503,9 +512,10 @@ func FindAccount(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "accounts", resp, 0)
 }
 
+// CreateAccount creates an account
 func CreateAccount(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "CreateAccount")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "CreateAccount")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -553,9 +563,10 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "create account", acc.AccountNumber, 0)
 }
 
+// GetJournal fetches a journal from journal ID
 func GetJournal(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "GetJournal")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "GetJournal")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -589,7 +600,7 @@ func GetJournal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	retJournal := &JournalDetail{
-		JournalId:       j.GetJournalID(),
+		JournalID:       j.GetJournalID(),
 		JournalingTime:  j.GetJournalingTime().Format(time.RFC3339),
 		Description:     j.GetDescription(),
 		Reversal:        j.IsReversal(),
@@ -606,10 +617,10 @@ func GetJournal(w http.ResponseWriter, r *http.Request) {
 			align = "CREDIT"
 		}
 		retTrxes[idx] = &TransactionListItem{
-			TransactionId:   trx.GetTransactionID(),
+			TransactionID:   trx.GetTransactionID(),
 			TransactionTime: trx.GetTransactionTime().Format(time.RFC3339),
 			AccountNumber:   trx.GetAccountNumber(),
-			JournalId:       trx.GetJournalID(),
+			JournalID:       trx.GetJournalID(),
 			Description:     trx.GetDescription(),
 			TransactionType: align,
 			Amount:          trx.GetAmount(),
@@ -623,9 +634,10 @@ func GetJournal(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", retJournal, 1)
 }
 
+// DrawJournal draws the journal activity for easier debugging
 func DrawJournal(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "DrawJournal")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "DrawJournal")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -660,15 +672,17 @@ func DrawJournal(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(drawing))
 }
 
+// PaginatedJournalsResponse is the journal response paginated
 type PaginatedJournalsResponse struct {
 	Journals   []acccore.Journal  `json:"journals"`
 	Pagination acccore.PageResult `json:"pagination"`
 }
 
+// ListJournal lists the journal given
 func ListJournal(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "ListJournal")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "ListJournal")
 	if ctx.Err() != nil {
 		llog.Errorf("context is canceled : %s", ctx.Err().Error())
 		helpers.HTTPResponseBuilder(ctx, w, r, 500, "request is canceled", "request is canceled", 0)
@@ -712,18 +726,21 @@ func ListJournal(w http.ResponseWriter, r *http.Request) {
 	}, 0)
 }
 
+// CreateReversalRequest is the create reversal request payload
 type CreateReversalRequest struct {
 	Description string `json:"description"`
 	JournalID   string `json:"journal_id"`
 	Creator     string `json:"creator"`
 }
 
+// CreateJournalRequest is the create journal request paylaod
 type CreateJournalRequest struct {
 	Description  string                `json:"description"`
 	Creator      string                `json:"creator"`
 	Transactions []*TransactionRequest `json:"transactions"`
 }
 
+// TransactionRequest is the create transaction request payload
 type TransactionRequest struct {
 	AccountNumber string `json:"account_number"`
 	Description   string `json:"description"`
@@ -731,9 +748,10 @@ type TransactionRequest struct {
 	Amount        int64  `json:"amount"`
 }
 
+// CreateJournal creates a journal
 func CreateJournal(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "CreateJournal")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "CreateJournal")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -795,9 +813,10 @@ func CreateJournal(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// CreateReversalJournal creates a reversal journal response
 func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "CreateReversalJournal")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "CreateReversalJournal")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -875,9 +894,10 @@ func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", journal.JournalID, 0)
 }
 
+// GetTransaction retrieves a transaction from its ID
 func GetTransaction(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "GetTransaction")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "GetTransaction")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -903,9 +923,10 @@ func GetTransaction(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", tx, 0)
 }
 
+// SetCommonDenominator sets the common denominator
 func SetCommonDenominator(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "SetCommonDenominator")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "SetCommonDenominator")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -926,9 +947,11 @@ func SetCommonDenominator(w http.ResponseWriter, r *http.Request) {
 	ExchangeMgr.SetDenom(r.Context(), big.NewFloat(f))
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", f, 0)
 }
+
+// GetCommonDenominator returns the current common denominator
 func GetCommonDenominator(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "GetCommonDenominator")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "GetCommonDenominator")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -940,9 +963,10 @@ func GetCommonDenominator(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", f, 0)
 }
 
+// SetCurrency sets the currency details
 func SetCurrency(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "SetCurrency")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "SetCurrency")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -1001,41 +1025,43 @@ func SetCurrency(w http.ResponseWriter, r *http.Request) {
 			Exchange: nCur.GetExchange(),
 		}, 1)
 		return
-	} else {
-		cur.SetExchange(setBody.Exchange).SetName(setBody.Name)
-		err = ExchangeMgr.UpdateCurrency(r.Context(), m["code"], cur, setBody.Author)
-		if err != nil {
-			if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrCurrencyNotFound) || err.Error() == "currency not found" {
-				helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "path not found", "currnecy not found", 1)
-				return
-			}
-			helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "internal server error", err.Error(), 1)
+	}
+	cur.SetExchange(setBody.Exchange).SetName(setBody.Name)
+	err = ExchangeMgr.UpdateCurrency(r.Context(), m["code"], cur, setBody.Author)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrCurrencyNotFound) || err.Error() == "currency not found" {
+			helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "path not found", "currnecy not found", 1)
 			return
 		}
-		helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", &CurrencyRet{
-			Code:     cur.GetCode(),
-			Name:     cur.GetName(),
-			Exchange: cur.GetExchange(),
-		}, 1)
+		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "internal server error", err.Error(), 1)
 		return
 	}
+	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", &CurrencyRet{
+		Code:     cur.GetCode(),
+		Name:     cur.GetName(),
+		Exchange: cur.GetExchange(),
+	}, 1)
+
 }
 
+// SetCurrencyBody is the set curreny request payload
 type SetCurrencyBody struct {
 	Name     string  `json:"name"`
 	Exchange float64 `json:"exchange"`
 	Author   string  `json:"author"`
 }
 
+// CurrencyRet is the currency respose
 type CurrencyRet struct {
 	Code     string  `json:"code"`
 	Name     string  `json:"name"`
 	Exchange float64 `json:"exchange"`
 }
 
+// ListCurrencies lists all the currency
 func ListCurrencies(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "ListCurrencies")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "ListCurrencies")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -1059,9 +1085,10 @@ func ListCurrencies(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", arr, 0)
 }
 
+// GetCurrency gets the currency details
 func GetCurrency(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "GetCurrency")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "GetCurrency")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -1093,9 +1120,10 @@ func GetCurrency(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", cret, 0)
 }
 
+// CalculateExchangeRate calculates the exchange rate
 func CalculateExchangeRate(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "CalculateExchangeRate")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "CalculateExchangeRate")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)
@@ -1129,9 +1157,10 @@ func CalculateExchangeRate(w http.ResponseWriter, r *http.Request) {
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "OK", f, 1)
 }
 
+// CalculateExchange calculates the exchange betwee two currencies
 func CalculateExchange(w http.ResponseWriter, r *http.Request) {
-	requestId := r.Context().Value(contextkeys.XRequestID).(string)
-	llog := restLog.WithField("RequestID", requestId).WithField("function", "CalculateExchange")
+	requestID := r.Context().Value(contextkeys.XRequestID).(string)
+	llog := restLog.WithField("RequestID", requestID).WithField("function", "CalculateExchange")
 	if r.Context().Err() != nil {
 		llog.Errorf("context is canceled : %s", r.Context().Err().Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "request is canceled", "request is canceled", 0)

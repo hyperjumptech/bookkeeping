@@ -2,10 +2,11 @@ package middlewares
 
 import (
 	"context"
-	"github.com/IDN-Media/awards/internal/contextkeys"
-	"github.com/hyperjumptech/acccore"
-	log "github.com/sirupsen/logrus"
 	"net/http"
+
+	"github.com/hyperjumptech/acccore"
+	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	log "github.com/sirupsen/logrus"
 )
 
 var (

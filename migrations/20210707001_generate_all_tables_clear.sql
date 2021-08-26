@@ -1,4 +1,4 @@
-use devdb;
+use wallet;
 
 DELETE FROM accounts;
 DELETE FROM currencies;
