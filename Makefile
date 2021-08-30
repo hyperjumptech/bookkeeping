@@ -1,7 +1,7 @@
 # hyperwallet makefile
 
 CURRENT_PATH ?= $(shell pwd)
-IMAGE_NAME ?= hyperwallet-go-img
+IMAGE_NAME ?= wallet-go-img
 
 .PHONY: all test clean build docker
 

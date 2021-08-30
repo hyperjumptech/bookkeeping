@@ -150,9 +150,9 @@ func DrawAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	accountNo := m["AccountNumber"]
-	account, err := AccountMgr.GetAccountById(r.Context(), accountNo)
+	account, err := AccountMgr.GetAccountByID(r.Context(), accountNo)
 	if err != nil {
-		llog.Errorf("error while calling AccountMgr.GetAccountById. got : %s", err.Error())
+		llog.Errorf("error while calling AccountMgr.GetAccountByID. got : %s", err.Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "backend error", err.Error(), 2)
 		return
 	}
@@ -194,9 +194,9 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	accountNo := m["AccountNumber"]
-	account, err := AccountMgr.GetAccountById(r.Context(), accountNo)
+	account, err := AccountMgr.GetAccountByID(r.Context(), accountNo)
 	if err != nil {
-		llog.Errorf("error while calling AccountMgr.GetAccountById. got : %s", err.Error())
+		llog.Errorf("error while calling AccountMgr.GetAccountByID. got : %s", err.Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "backend error", err.Error(), 2)
 		return
 	}
@@ -293,9 +293,9 @@ func ListTransactionByAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	accountNo := m["AccountNumber"]
-	account, err := AccountMgr.GetAccountById(r.Context(), accountNo)
+	account, err := AccountMgr.GetAccountByID(r.Context(), accountNo)
 	if err != nil {
-		llog.Errorf("error while calling AccountMgr.GetAccountById. got : %s", err.Error())
+		llog.Errorf("error while calling AccountMgr.GetAccountByID. got : %s", err.Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "backend error", err.Error(), 2)
 		return
 	}
@@ -580,9 +580,9 @@ func GetJournal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	j, err := JournalMgr.GetJournalById(r.Context(), m["JournalID"])
+	j, err := JournalMgr.GetJournalByID(r.Context(), m["JournalID"])
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrJournalIdNotFound) {
+		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrJournalIDNotFound) {
 			helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "path not found", "journal not found", 1)
 			return
 		}
@@ -651,9 +651,9 @@ func DrawJournal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	j, err := JournalMgr.GetJournalById(r.Context(), m["JournalID"])
+	j, err := JournalMgr.GetJournalByID(r.Context(), m["JournalID"])
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrJournalIdNotFound) {
+		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrJournalIDNotFound) {
 			helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "path not found", "journal not found", 1)
 			return
 		}
@@ -836,9 +836,9 @@ func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rJournal, err := JournalMgr.GetJournalById(r.Context(), rBody.JournalID)
+	rJournal, err := JournalMgr.GetJournalByID(r.Context(), rBody.JournalID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrJournalIdNotFound) {
+		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrJournalIDNotFound) {
 			helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "journal not found", "journal to reverse not found", 0)
 			return
 		}
@@ -911,7 +911,7 @@ func GetTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tx, err := TransactionMgr.GetTransactionById(r.Context(), m["TransactionID"])
+	tx, err := TransactionMgr.GetTransactionByID(r.Context(), m["TransactionID"])
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, acccore.ErrTransactionNotFound) {
 			helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "path not found", "transaction id not found", 1)

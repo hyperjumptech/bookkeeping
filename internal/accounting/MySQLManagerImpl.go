@@ -22,6 +22,8 @@ var (
 )
 
 // JOURNAL MANAGER ------------------------------------------------------------------
+
+// NewMySQLJournalManager returns the sql journal manager
 func NewMySQLJournalManager(repo connector.DBRepository) acccore.JournalManager {
 	return &MySQLJournalManager{repo: repo}
 }
@@ -47,8 +49,8 @@ func (jm *MySQLJournalManager) NewJournal(ctx context.Context) acccore.Journal {
 // accounts and transactions. If your db do not support this, you can implement your own 2 phase commits mechanism
 // on the CommitJournal and CancelJournal
 func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPersist acccore.Journal) error {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "PersistJournal")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "PersistJournal")
 
 	// First we have to make sure that the journalToPersist is not yet in our database.
 	// 1. Checking if anything mandatory is not missing
@@ -57,7 +59,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 	}
 	if len(journalToPersist.GetJournalID()) == 0 {
 		lLog.Errorf("error persisting journal. journal is missing the journalID")
-		return acccore.ErrJournalMissingId
+		return acccore.ErrJournalMissingID
 	}
 	if len(journalToPersist.GetTransactions()) == 0 {
 		lLog.Errorf("error persisting journal %s. journal contains no transactions.", journalToPersist.GetJournalID())
@@ -73,7 +75,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 	//    If COUNT(*) is > 0 return error
 	j, err := jm.repo.GetJournal(ctx, journalToPersist.GetJournalID())
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) && !errors.Is(err, acccore.ErrJournalIdNotFound) {
+		if !errors.Is(err, sql.ErrNoRows) && !errors.Is(err, acccore.ErrJournalIDNotFound) {
 			lLog.Errorf("error while fetching journal %s. got %s", journalToPersist.GetJournalID(), err.Error())
 			return err
 		}
@@ -95,7 +97,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 	for idx, trx := range journalToPersist.GetTransactions() {
 		t, err := jm.repo.GetTransaction(ctx, trx.GetTransactionID())
 		if err != nil {
-			if !errors.Is(err, sql.ErrNoRows) && !errors.Is(err, acccore.ErrJournalIdNotFound) {
+			if !errors.Is(err, sql.ErrNoRows) && !errors.Is(err, acccore.ErrJournalIDNotFound) {
 				lLog.Errorf("error while fetching transaction %s. got %s", trx.GetTransactionID(), err.Error())
 				return err
 			}
@@ -145,7 +147,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 	for idx, trx := range journalToPersist.GetTransactions() {
 		account, err := jm.repo.GetAccount(ctx, trx.GetAccountNumber())
 		if err != nil || account == nil {
-			return acccore.ErrAccountIdNotFound
+			return acccore.ErrAccountIDNotFound
 		}
 		cur := account.CurrencyCode
 		if idx == 0 {
@@ -160,7 +162,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 
 	// 9. If this is a reversal journal, make sure the journal being reversed have not been reversed before.
 	if journalToPersist.GetReversedJournal() != nil {
-		reversed, err := jm.IsJournalIdReversed(ctx, journalToPersist.GetJournalID())
+		reversed, err := jm.IsJournalIDReversed(ctx, journalToPersist.GetJournalID())
 		if err != nil {
 			return err
 		}
@@ -189,18 +191,18 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 		JournalingTime:    time.Now(),
 		Description:       journalToPersist.GetDescription(),
 		IsReversal:        false,
-		ReversedJournalId: "",
+		ReversedJournalID: "",
 		TotalAmount:       creditSum,
 		CreatedAt:         time.Now(),
 		CreatedBy:         journalToPersist.GetCreateBy(),
 	}
 
 	if journalToPersist.GetReversedJournal() != nil {
-		journalToInsert.ReversedJournalId = journalToPersist.GetReversedJournal().GetJournalID()
+		journalToInsert.ReversedJournalID = journalToPersist.GetReversedJournal().GetJournalID()
 		journalToInsert.IsReversal = true
 	}
 
-	journalId, err := jm.repo.InsertJournal(ctx, journalToInsert)
+	journalID, err := jm.repo.InsertJournal(ctx, journalToInsert)
 	if err != nil {
 		lLog.Errorf("error inserting new journal %s . got %s. rolling back transaction.", journalToInsert.JournalID, err.Error())
 		err = tx.Rollback()
@@ -216,7 +218,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 			TransactionID:   trx.GetTransactionID(),
 			TransactionTime: trx.GetTransactionTime(),
 			AccountNumber:   trx.GetAccountNumber(),
-			JournalID:       journalId,
+			JournalID:       journalID,
 			Description:     trx.GetDescription(),
 			//Alignment:     string(trx.GetTransactionType()),
 			Amount:    trx.GetAmount(),
@@ -304,14 +306,14 @@ func (jm *MySQLJournalManager) CancelJournal(ctx context.Context, journalToCance
 	return nil
 }
 
-// IsJournalIdReversed check if the journal with specified ID has been reversed
-func (jm *MySQLJournalManager) IsJournalIdReversed(ctx context.Context, journalId string) (bool, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "IsJournalIdReversed")
+// IsJournalIDReversed check if the journal with specified ID has been reversed
+func (jm *MySQLJournalManager) IsJournalIDReversed(ctx context.Context, journalID string) (bool, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "IsJournalIdReversed")
 	// SELECT COUNT(*) FROM JOURNAL WHERE REVERSED_JOURNAL_ID = {journalID}
 	// return false if COUNT = 0
 	// return true if COUNT > 0
-	journal, err := jm.repo.GetJournalByReversalID(ctx, journalId)
+	journal, err := jm.repo.GetJournalByReversalID(ctx, journalID)
 	if err != nil || journal == nil {
 		lLog.Errorf("error while calling GetJournalByReversalID. got %s", err.Error())
 		return false, nil
@@ -319,12 +321,12 @@ func (jm *MySQLJournalManager) IsJournalIdReversed(ctx context.Context, journalI
 	return true, nil
 }
 
-// IsTransactionIdExist will check if an Transaction ID/number is exist in the database.
-func (jm *MySQLJournalManager) IsJournalIdExist(ctx context.Context, journalId string) (bool, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "IsJournalIdExist")
+// IsJournalIDExist will check if a journal ID/number exist in the database.
+func (jm *MySQLJournalManager) IsJournalIDExist(ctx context.Context, journalID string) (bool, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "IsJournalIdExist")
 
-	journal, err := jm.repo.GetJournal(ctx, journalId)
+	journal, err := jm.repo.GetJournal(ctx, journalID)
 	if err != nil || journal == nil {
 		lLog.Errorf("error while calling GetJournal. got %s", err.Error())
 		return false, nil
@@ -332,13 +334,13 @@ func (jm *MySQLJournalManager) IsJournalIdExist(ctx context.Context, journalId s
 	return true, nil
 }
 
-// GetJournalById retrieved a Journal information identified by its ID.
+// GetJournalByID retrieved a Journal information identified by its ID.
 // the provided ID must be exactly the same, not uses the LIKE select expression.
-func (jm *MySQLJournalManager) GetJournalById(ctx context.Context, journalId string) (acccore.Journal, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "GetJournalById")
+func (jm *MySQLJournalManager) GetJournalByID(ctx context.Context, journalID string) (acccore.Journal, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "GetJournalById")
 
-	journal, err := jm.repo.GetJournal(ctx, journalId)
+	journal, err := jm.repo.GetJournal(ctx, journalID)
 	if err != nil {
 		lLog.Errorf("error while calling GetJournal. got %s", err.Error())
 		return nil, err
@@ -353,7 +355,7 @@ func (jm *MySQLJournalManager) GetJournalById(ctx context.Context, journalId str
 		SetJournalID(journal.JournalID)
 
 	if journal.IsReversal {
-		reversed, err := jm.GetJournalById(ctx, journal.ReversedJournalId)
+		reversed, err := jm.GetJournalByID(ctx, journal.ReversedJournalID)
 		if err != nil {
 			lLog.Errorf("error while calling GetJournal. got %s", err.Error())
 			return nil, acccore.ErrJournalLoadReversalInconsistent
@@ -363,7 +365,7 @@ func (jm *MySQLJournalManager) GetJournalById(ctx context.Context, journalId str
 
 	// Populate all transactions from DB.
 	transactions := make([]acccore.Transaction, 0)
-	trxs, err := jm.repo.ListTransactionByJournalID(ctx, journalId)
+	trxs, err := jm.repo.ListTransactionByJournalID(ctx, journalID)
 	if err != nil {
 		lLog.Errorf("error while calling jm.repo.ListTransactionByJournalID. got %s", err.Error())
 		return nil, err
@@ -388,8 +390,8 @@ func (jm *MySQLJournalManager) GetJournalById(ctx context.Context, journalId str
 // ListJournals retrieve list of journals with transaction date between the `from` and `until` time range inclusive.
 // This function uses pagination.
 func (jm *MySQLJournalManager) ListJournals(ctx context.Context, from time.Time, until time.Time, request acccore.PageRequest) (acccore.PageResult, []acccore.Journal, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "ListJournals")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "ListJournals")
 
 	count, err := jm.repo.CountJournalByTimeRange(ctx, from, until)
 	if err != nil {
@@ -404,7 +406,7 @@ func (jm *MySQLJournalManager) ListJournals(ctx context.Context, from time.Time,
 	}
 	ret := make([]acccore.Journal, 0)
 	for _, jrnl := range jRecords {
-		journal, err := jm.GetJournalById(ctx, jrnl.JournalID)
+		journal, err := jm.GetJournalByID(ctx, jrnl.JournalID)
 		if err != nil {
 			lLog.Errorf("Error while retrieving journal %s. got %s. skipping", jrnl.JournalID, err.Error())
 		} else {
@@ -440,6 +442,8 @@ func (jm *MySQLJournalManager) RenderJournal(ctx context.Context, journal acccor
 }
 
 // TRANSACTION MANAGER ------------------------------------------------------------------
+
+// NewMySQLTransactionManager returns new SQL Transaction Manager
 func NewMySQLTransactionManager(repo connector.DBRepository) acccore.TransactionManager {
 	return &MySQLTransactionManager{repo: repo}
 }
@@ -454,10 +458,10 @@ func (am *MySQLTransactionManager) NewTransaction(ctx context.Context) acccore.T
 	return &acccore.BaseTransaction{}
 }
 
-// IsTransactionIdExist will check if an Transaction ID/number is exist in the database.
-func (am *MySQLTransactionManager) IsTransactionIdExist(ctx context.Context, id string) (bool, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "IsTransactionIdExist")
+// IsTransactionIDExist will check if an Transaction ID/number is exist in the database.
+func (am *MySQLTransactionManager) IsTransactionIDExist(ctx context.Context, id string) (bool, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "IsTransactionIdExist")
 
 	tx, err := am.repo.GetTransaction(ctx, id)
 	if err != nil {
@@ -470,10 +474,10 @@ func (am *MySQLTransactionManager) IsTransactionIdExist(ctx context.Context, id 
 	return true, nil
 }
 
-// GetTransactionById will retrieve one single transaction that identified by some ID
-func (am *MySQLTransactionManager) GetTransactionById(ctx context.Context, id string) (acccore.Transaction, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "GetTransactionById")
+// GetTransactionByID will retrieve one single transaction that identified by some ID
+func (am *MySQLTransactionManager) GetTransactionByID(ctx context.Context, id string) (acccore.Transaction, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "GetTransactionById")
 
 	tx, err := am.repo.GetTransaction(ctx, id)
 	if err != nil {
@@ -497,12 +501,12 @@ func (am *MySQLTransactionManager) GetTransactionById(ctx context.Context, id st
 	return trx, nil
 }
 
-// ListTransactionsWithAccount retrieves list of transactions that belongs to this account
+// ListTransactionsOnAccount retrieves list of transactions that belongs to this account
 // that transaction happens between the `from` and `until` time range.
 // This function uses pagination
 func (am *MySQLTransactionManager) ListTransactionsOnAccount(ctx context.Context, from time.Time, until time.Time, account acccore.Account, request acccore.PageRequest) (acccore.PageResult, []acccore.Transaction, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "ListTransactionsOnAccount")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "ListTransactionsOnAccount")
 
 	count, err := am.repo.CountTransactionByAccountNumber(ctx, account.GetAccountNumber(), from, until)
 	if err != nil {
@@ -534,8 +538,8 @@ func (am *MySQLTransactionManager) ListTransactionsOnAccount(ctx context.Context
 
 // RenderTransactionsOnAccount Render list of transaction been down on an account in a time span
 func (am *MySQLTransactionManager) RenderTransactionsOnAccount(ctx context.Context, from time.Time, until time.Time, account acccore.Account, request acccore.PageRequest) (string, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "RenderTransactionsOnAccount")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "RenderTransactionsOnAccount")
 
 	result, transactions, err := am.ListTransactionsOnAccount(ctx, from, until, account, request)
 	if err != nil {
@@ -571,6 +575,8 @@ func (am *MySQLTransactionManager) RenderTransactionsOnAccount(ctx context.Conte
 }
 
 // ACCOUNT MANAGER ------------------------------------------------------------------
+
+// NewMySQLAccountManager returns new sql account manager
 func NewMySQLAccountManager(repo connector.DBRepository) acccore.AccountManager {
 	return &MySQLAccountManager{repo: repo}
 }
@@ -588,8 +594,8 @@ func (am *MySQLAccountManager) NewAccount(ctx context.Context) acccore.Account {
 // PersistAccount will save the account into database.
 // will throw error if the account already persisted
 func (am *MySQLAccountManager) PersistAccount(ctx context.Context, AccountToPersist acccore.Account) error {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "PersistAccount")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "PersistAccount")
 
 	if len(AccountToPersist.GetAccountNumber()) == 0 {
 		return acccore.ErrAccountMissingID
@@ -640,8 +646,8 @@ func (am *MySQLAccountManager) PersistAccount(ctx context.Context, AccountToPers
 // UpdateAccount will update the account database to reflect to the provided account information.
 // This update account function will fail if the account ID/number is not existing in the database.
 func (am *MySQLAccountManager) UpdateAccount(ctx context.Context, AccountToUpdate acccore.Account) error {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "UpdateAccount")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "UpdateAccount")
 
 	if len(AccountToUpdate.GetAccountNumber()) == 0 {
 		return acccore.ErrAccountMissingID
@@ -657,7 +663,7 @@ func (am *MySQLAccountManager) UpdateAccount(ctx context.Context, AccountToUpdat
 	}
 
 	// First make sure that The account have never been created in DB.
-	exist, err := am.IsAccountIdExist(ctx, AccountToUpdate.GetAccountNumber())
+	exist, err := am.IsAccountIDExist(ctx, AccountToUpdate.GetAccountNumber())
 	if err != nil {
 		lLog.Errorf("error while calling am.IsAccountIdExist. got %s", err.Error())
 		return err
@@ -690,10 +696,10 @@ func (am *MySQLAccountManager) UpdateAccount(ctx context.Context, AccountToUpdat
 
 }
 
-// IsAccountIdExist will check if an account ID/number is exist in the database.
-func (am *MySQLAccountManager) IsAccountIdExist(ctx context.Context, id string) (bool, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "IsAccountIdExist")
+// IsAccountIDExist will check if an account ID/number is exist in the database.
+func (am *MySQLAccountManager) IsAccountIDExist(ctx context.Context, id string) (bool, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "IsAccountIdExist")
 
 	ar, err := am.repo.GetAccount(ctx, id)
 	if err != nil {
@@ -707,10 +713,10 @@ func (am *MySQLAccountManager) IsAccountIdExist(ctx context.Context, id string) 
 	return true, nil
 }
 
-// GetAccountById retrieve an account information by specifying the ID/number
-func (am *MySQLAccountManager) GetAccountById(ctx context.Context, id string) (acccore.Account, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "GetAccountById")
+// GetAccountByID retrieve an account information by specifying the ID/number
+func (am *MySQLAccountManager) GetAccountByID(ctx context.Context, id string) (acccore.Account, error) {
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "GetAccountById")
 
 	rec, err := am.repo.GetAccount(ctx, id)
 	if err != nil {
@@ -737,8 +743,8 @@ func (am *MySQLAccountManager) GetAccountById(ctx context.Context, id string) (a
 // ListAccounts list all account in the database.
 // This function uses pagination
 func (am *MySQLAccountManager) ListAccounts(ctx context.Context, request acccore.PageRequest) (acccore.PageResult, []acccore.Account, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "ListAccounts")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "ListAccounts")
 
 	count, err := am.repo.CountAccounts(ctx)
 	if err != nil {
@@ -774,8 +780,8 @@ func (am *MySQLAccountManager) ListAccounts(ctx context.Context, request acccore
 // ListAccountByCOA returns list of accounts that have the same COA number.
 // This function uses pagination
 func (am *MySQLAccountManager) ListAccountByCOA(ctx context.Context, coa string, request acccore.PageRequest) (acccore.PageResult, []acccore.Account, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "ListAccountByCOA")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "ListAccountByCOA")
 
 	count, err := am.repo.CountAccountByCoa(ctx, coa)
 	if err != nil {
@@ -810,8 +816,8 @@ func (am *MySQLAccountManager) ListAccountByCOA(ctx context.Context, coa string,
 // FindAccounts returns list of accounts that have their name contains a substring of specified parameter.
 // this search should  be case insensitive.
 func (am *MySQLAccountManager) FindAccounts(ctx context.Context, nameLike string, request acccore.PageRequest) (acccore.PageResult, []acccore.Account, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "FindAccounts")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "FindAccounts")
 
 	count, err := am.repo.CountAccountByName(ctx, nameLike)
 	if err != nil {
@@ -843,10 +849,12 @@ func (am *MySQLAccountManager) FindAccounts(ctx context.Context, nameLike string
 	return pResult, ret, nil
 }
 
+// NewMySQLExchangeManager new sqlexcnage amanager
 func NewMySQLExchangeManager(repo connector.DBRepository) acccore.ExchangeManager {
 	return &MySQLExchangeManager{repo: repo, commonDenominator: 1.0}
 }
 
+// MySQLExchangeManager is the manager struct
 type MySQLExchangeManager struct {
 	repo              connector.DBRepository
 	commonDenominator float64
@@ -856,8 +864,8 @@ type MySQLExchangeManager struct {
 // non-existent currency means that the currency is not supported.
 // error should be thrown if only there's an underlying error such as db error.
 func (am *MySQLExchangeManager) IsCurrencyExist(ctx context.Context, currency string) (bool, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "IsCurrencyExist")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "IsCurrencyExist")
 
 	cr, err := am.repo.GetCurrency(ctx, currency)
 	if err != nil {
@@ -872,16 +880,16 @@ func (am *MySQLExchangeManager) IsCurrencyExist(ctx context.Context, currency st
 
 // GetDenom get the current common denominator used in the exchange
 func (am *MySQLExchangeManager) GetDenom(ctx context.Context) *big.Float {
-	//requestId := ctx.Value(contextkeys.XRequestID).(string)
-	//lLog := dbLog.WithField("RequestID", requestId).WithField("function", "GetDenom")
+	//requestID := ctx.Value(contextkeys.XRequestID).(string)
+	//lLog := dbLog.WithField("RequestID", requestID).WithField("function", "GetDenom")
 
 	return big.NewFloat(am.commonDenominator)
 }
 
 // SetDenom set the current common denominator value into the specified value
 func (am *MySQLExchangeManager) SetDenom(ctx context.Context, denom *big.Float) {
-	//requestId := ctx.Value(contextkeys.XRequestID).(string)
-	//lLog := dbLog.WithField("RequestID", requestId).WithField("function", "SetDenom")
+	//requestID := ctx.Value(contextkeys.XRequestID).(string)
+	//lLog := dbLog.WithField("RequestID", requestID).WithField("function", "SetDenom")
 
 	f, _ := denom.Float64()
 	am.commonDenominator = f
@@ -889,8 +897,8 @@ func (am *MySQLExchangeManager) SetDenom(ctx context.Context, denom *big.Float) 
 
 // GetCurrency retrieve currency data indicated by the code argument
 func (am *MySQLExchangeManager) GetCurrency(ctx context.Context, code string) (acccore.Currency, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	llog := dbLog.WithField("RequestID", requestId).WithField("function", "GetCurrency")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	llog := dbLog.WithField("RequestID", requestID).WithField("function", "GetCurrency")
 
 	rec, err := am.repo.GetCurrency(ctx, code)
 	if err != nil {
@@ -918,8 +926,8 @@ func (am *MySQLExchangeManager) GetCurrency(ctx context.Context, code string) (a
 // CreateCurrency set the specified value as denominator value for that speciffic Currency.
 // This function should return error if the Currency specified is not exist.
 func (am *MySQLExchangeManager) CreateCurrency(ctx context.Context, code, name string, exchange *big.Float, author string) (acccore.Currency, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	llog := dbLog.WithField("RequestID", requestId).WithField("function", "CreateCurrency")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	llog := dbLog.WithField("RequestID", requestID).WithField("function", "CreateCurrency")
 	ex, _ := exchange.Float64()
 	rec := &connector.CurrenciesRecord{
 		Code:      code,
@@ -949,8 +957,8 @@ func (am *MySQLExchangeManager) CreateCurrency(ctx context.Context, code, name s
 // UpdateCurrency updates the currency data
 // Error should be returned if the specified Currency is not exist.
 func (am *MySQLExchangeManager) UpdateCurrency(ctx context.Context, code string, currency acccore.Currency, author string) error {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	llog := dbLog.WithField("RequestID", requestId).WithField("function", "UpdateCurrency")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	llog := dbLog.WithField("RequestID", requestID).WithField("function", "UpdateCurrency")
 
 	rec := &connector.CurrenciesRecord{
 		Code:      code,
@@ -970,12 +978,12 @@ func (am *MySQLExchangeManager) UpdateCurrency(ctx context.Context, code string,
 	return nil
 }
 
-// Get the currency exchange rate for exchanging between the two currency.
+// CalculateExchangeRate Get the currency exchange rate for exchanging between the two currency.
 // if any of the currency is not exist, an error should be returned.
 // if from and to currency is equal, this must return 1.0
 func (am *MySQLExchangeManager) CalculateExchangeRate(ctx context.Context, fromCurrency, toCurrency string) (*big.Float, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "CalculateExchangeRate")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "CalculateExchangeRate")
 
 	from, err := am.GetCurrency(ctx, fromCurrency)
 	if err != nil {
@@ -1003,12 +1011,12 @@ func (am *MySQLExchangeManager) CalculateExchangeRate(ctx context.Context, fromC
 	return m3, nil
 }
 
-// Get the currency exchange value for the amount of fromCurrency into toCurrency.
+// CalculateExchange gets the currency exchange value for the amount of fromCurrency into toCurrency.
 // If any of the currency is not exist, an error should be returned.
 // if from and to currency is equal, the returned amount must be equal to the amount in the argument.
 func (am *MySQLExchangeManager) CalculateExchange(ctx context.Context, fromCurrency, toCurrency string, amount int64) (int64, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	lLog := dbLog.WithField("RequestID", requestId).WithField("function", "CalculateExchange")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "CalculateExchange")
 
 	exchange, err := am.CalculateExchangeRate(ctx, fromCurrency, toCurrency)
 	if err != nil {
@@ -1022,8 +1030,8 @@ func (am *MySQLExchangeManager) CalculateExchange(ctx context.Context, fromCurre
 
 // ListCurrencies will list all currencies.
 func (am *MySQLExchangeManager) ListCurrencies(ctx context.Context) ([]acccore.Currency, error) {
-	requestId := ctx.Value(contextkeys.XRequestID).(string)
-	llog := dbLog.WithField("RequestID", requestId).WithField("function", "ListCurrencies")
+	requestID := ctx.Value(contextkeys.XRequestID).(string)
+	llog := dbLog.WithField("RequestID", requestID).WithField("function", "ListCurrencies")
 
 	records, err := am.repo.ListCurrency(ctx, "code", 0, 1000)
 	if err != nil {
