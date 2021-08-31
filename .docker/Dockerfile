@@ -1,5 +1,5 @@
-FROM golang:alpine as builder
-LABEL maintainer="https://github.com/hyperjumptech/hyperwallet"
+FROM golang:1.17-alpine as builder
+LABEL maintainer="https://github.com/hyperjumptech/hyper-wallet"
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \
@@ -22,7 +22,7 @@ RUN adduser \
 
 COPY . .
 RUN go mod tidy
-RUN go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o seed-go-img cmd/Main.go
+RUN go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o wallet-go-img cmd/Main.go
 
 
 #############################

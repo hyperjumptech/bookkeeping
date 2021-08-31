@@ -1,4 +1,4 @@
-# hyperwallet makefile
+# hyper-wallet makefile
 
 CURRENT_PATH ?= $(shell pwd)
 IMAGE_NAME ?= wallet-go-img
