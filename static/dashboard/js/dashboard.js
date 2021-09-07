@@ -620,6 +620,7 @@ function PostJournal() {
                 notif.addClass("px-3 py-3 bg-gradient-success text-white");
                 notif.text("Journal posted successfuly. Journal number is : " + data.data);
             }
+            Transactions.splice(0, Transactions.length);
         },
         error: function(data, errorThrown) {
             notif.removeClass();
