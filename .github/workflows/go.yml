@@ -25,10 +25,10 @@ jobs:
       run: go vet ./...
 
     - name: Test project
-      run: go test -v ./... -race -covermode=atomic -coverprofile=coverage.out
+      run: go test -v ./... -race -covermode=atomic -coverprofile=coverage.out -short
 
     - name: Build image
       run: go build -v cmd/Main.go
 
     - name: Build docker
-      run: docker build . --file .docker/Dockerfile -t seed-go-img:$(date +%s)
+      run: docker build . --file .docker/Dockerfile -t wallet-go-img:$(date +%s)
