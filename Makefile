@@ -14,7 +14,7 @@ clean:
 	rm -f $(IMAGE_NAME)
 
 lint: build
-	# golint -set_exit_status ./...
+	golint -set_exit_status ./...
 
 test-short: lint
 	go test ./... -v -covermode=count -coverprofile=coverage.out -short

@@ -155,12 +155,12 @@ func TestRestAll(t *testing.T) {
 	t.Run("Test Journal Commit 2,000,000 Gold",
 		MakeJournalTest("Committing Gold Reserve",
 			GoldReserveAccountNo, "Reserving Gold",
-			GoldCommitmentAccountNo, "Commiting Gold",
+			GoldCommitmentAccountNo, "Committing Gold",
 			2000000))
 	t.Run("Test Journal Commit 2,000,000 Point",
 		MakeJournalTest("Committing Point Reserve",
 			PointReserveAccountNo, "Reserving Point",
-			PointCommitmentAccountNo, "Commiting Point",
+			PointCommitmentAccountNo, "Committing Point",
 			2000000))
 
 	t.Run("Test Ferdinand Topup 500,000 Gold",
@@ -273,7 +273,7 @@ func MakeJournalTest(desc, accDebit, descDebit, accCredit, descCredit string, am
 		assert.Equal(t, http.StatusOK, recorder.Code)
 
 		bodyObj := &CreateAccountResponse{}
-		err = json.Unmarshal(recorder.Body.Bytes(), &bodyObj)
+		_ = json.Unmarshal(recorder.Body.Bytes(), &bodyObj)
 		assert.True(t, len(bodyObj.Data) > 0)
 	}
 }

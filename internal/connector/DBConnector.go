@@ -105,7 +105,7 @@ type CurrenciesRecord struct {
 
 // DBRepository is the database structure
 type DBRepository interface {
-	// Connect connect ther repository to the database, it uses the configuration internally for connection arguments and parameters.
+	// Connect connect there repository to the database, it uses the configuration internally for connection arguments and parameters.
 	Connect(ctx context.Context) error
 
 	// Disconnect the already establshed connection. Throws error if the underlying database connection yield an error

@@ -151,7 +151,7 @@ func walk(r mux.Router) {
 		if err != nil {
 			pathTemplates = "err"
 		}
-		methodArr, err := route.GetMethods()
+		methodArr, _ := route.GetMethods()
 		methods = strings.Join(methodArr, ",")
 		log.Debugf("    Path : %s. Methods : %s", pathTemplates, methods)
 		return nil
