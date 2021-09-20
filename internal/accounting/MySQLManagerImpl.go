@@ -281,7 +281,7 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 	// COMMIT transaction
 	err = tx.Commit()
 	if err != nil {
-		lLog.Errorf("error commiting transaction. got %s", err.Error())
+		lLog.Errorf("error committing transaction. got %s", err.Error())
 		return err
 	}
 
@@ -860,7 +860,7 @@ type MySQLExchangeManager struct {
 	commonDenominator float64
 }
 
-// IsCurrencyExist will check in the exchange system for a currency existance
+// IsCurrencyExist will check in the exchange system for a currency existence
 // non-existent currency means that the currency is not supported.
 // error should be thrown if only there's an underlying error such as db error.
 func (am *MySQLExchangeManager) IsCurrencyExist(ctx context.Context, currency string) (bool, error) {

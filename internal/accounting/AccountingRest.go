@@ -1044,7 +1044,7 @@ func SetCurrency(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// SetCurrencyBody is the set curreny request payload
+// SetCurrencyBody is the set currency request payload
 type SetCurrencyBody struct {
 	Name     string  `json:"name"`
 	Exchange float64 `json:"exchange"`
