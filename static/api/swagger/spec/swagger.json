@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "description": "This is the awards service swagger api documentation.  You can find\nout more about Swagger at\n[http://swagger.io](http://swagger.io) or on\n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n",
+    "description": "This is the API documentation for a generic wallet service with double bookkeeping.  You can find\nout more about Swagger at\n[http://swagger.io](http://swagger.io) or on\n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n",
     "version": "0.0.1",
-    "title": "awards.idn.media",
+    "title": "hyper-wallet",
     "termsOfService": "http://swagger.io/terms/",
     "contact": {
       "email": "apiteam@swagger.io"
@@ -16,7 +16,7 @@
   "servers": [
     {
       "description": "HTTP Localhost",
-      "url": "http://localhost:50051"
+      "url": "http://localhost:700"
     }
   ],
   "tags": [
