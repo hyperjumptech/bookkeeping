@@ -25,12 +25,12 @@ func LoadConfig() {
 	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 	viper.AutomaticEnv()
 
-	defCfg["app.id"] = "hyper-wallet-go"
+	defCfg["app.id"] = "wallet-go-img"
 	defCfg["app.version"] = "0.0.1"
 	defCfg["app.env"] = "development" // set to production
 
 	defCfg["server.host"] = "localhost"
-	defCfg["server.port"] = "50051"
+	defCfg["server.port"] = "7000"
 	defCfg["server.log.level"] = "debug" // valid values are trace, debug, info, warn, error, fatal
 	defCfg["server.timeout.write"] = "15 seconds"
 	defCfg["server.timeout.read"] = "15 seconds"
@@ -41,7 +41,7 @@ func LoadConfig() {
 
 	defCfg["db.host"] = "localhost"
 	defCfg["db.port"] = "3306"
-	defCfg["db.user"] = "wallet"
+	defCfg["db.user"] = "wallet_user"
 	defCfg["db.password"] = "wallet"
 	defCfg["db.name"] = "wallet"
 
