@@ -45,7 +45,7 @@ func LoadConfig() {
 	defCfg["db.password"] = "wallet"
 	defCfg["db.name"] = "wallet"
 
-	defCfg["health.local"] = "localhost:8080"
+	defCfg["health.local"] = "https://httpbin.org/status/200"
 	defCfg["health.delay"] = "1"      // seconds
 	defCfg["health.interval"] = "120" // seconds
 

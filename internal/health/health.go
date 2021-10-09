@@ -7,7 +7,7 @@ import (
 	gosundheit "github.com/AppsFlyer/go-sundheit"
 	"github.com/AppsFlyer/go-sundheit/checks"
 	"github.com/hyperjumptech/hyperwallet/internal/config"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
+	"github.com/jmoiron/sqlx"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,7 +19,7 @@ var (
 )
 
 // InitializeHealthCheck initializes health monitors
-func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepository) error {
+func InitializeHealthCheck(ctx context.Context, repo *sqlx.DB) error {
 	logf := healthLog.WithField("fn", "InitializeHealthCheck")
 
 	if ctx.Err() != nil {
@@ -54,7 +54,7 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	}
 
 	// For checking database connections
-	dbCheck, err := checks.NewPingCheck("db.check", repo.DB())
+	dbCheck, err := checks.NewPingCheck("db.check", repo)
 	if err != nil {
 		logf.Error("could not setup dbCheck")
 	}
@@ -68,5 +68,4 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	}
 
 	return nil
-
 }

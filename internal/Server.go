@@ -81,7 +81,7 @@ func InitializeServer() error {
 	}
 
 	// setup health monitoring
-	err = health.InitializeHealthCheck(ctx, dbRepo.(*connector.MySQLDBRepository))
+	err = health.InitializeHealthCheck(ctx, dbRepo.DB())
 	if err != nil {
 		logf.Warn("health monitor error: ", err)
 	}
