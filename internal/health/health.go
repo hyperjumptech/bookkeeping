@@ -2,12 +2,13 @@ package health
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	gosundheit "github.com/AppsFlyer/go-sundheit"
 	"github.com/AppsFlyer/go-sundheit/checks"
 	"github.com/hyperjumptech/hyperwallet/internal/config"
-	"github.com/jmoiron/sqlx"
+	"github.com/hyperjumptech/hyperwallet/internal/connector"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,13 +20,16 @@ var (
 )
 
 // InitializeHealthCheck initializes health monitors
-func InitializeHealthCheck(ctx context.Context, repo *sqlx.DB) error {
+func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepository) error {
 	logf := healthLog.WithField("fn", "InitializeHealthCheck")
 
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 
+	if !repo.IsConnected() {
+		return errors.New("Db not connected, healthcheck disabled")
+	}
 	// create a new health instance
 	H = gosundheit.New()
 
@@ -54,7 +58,7 @@ func InitializeHealthCheck(ctx context.Context, repo *sqlx.DB) error {
 	}
 
 	// For checking database connections
-	dbCheck, err := checks.NewPingCheck("db.check", repo)
+	dbCheck, err := checks.NewPingCheck("db.check", repo.DB().DB)
 	if err != nil {
 		logf.Error("could not setup dbCheck")
 	}

@@ -39,7 +39,7 @@ var (
 	address string
 
 	// dbRepo database repository
-	dbRepo connector.DBRepository
+	dbRepo connector.MySQLDBRepository
 )
 
 // InitializeServer initializes all server connections
@@ -62,17 +62,17 @@ func InitializeServer() error {
 	appRouter.Router = mux.NewRouter()
 
 	// setup db connection
-	dbRepo = &connector.MySQLDBRepository{}
+	dbRepo = connector.MySQLDBRepository{}
 	err := dbRepo.Connect(ctx)
 	if err != nil {
 		logf.Fatal("could not connect to db. Error: ", err)
 		panic("DB connection failed. please check log.")
 	}
 
-	accounting.AccountMgr = accounting.NewMySQLAccountManager(dbRepo)
-	accounting.JournalMgr = accounting.NewMySQLJournalManager(dbRepo)
-	accounting.TransactionMgr = accounting.NewMySQLTransactionManager(dbRepo)
-	accounting.ExchangeMgr = accounting.NewMySQLExchangeManager(dbRepo)
+	accounting.AccountMgr = accounting.NewMySQLAccountManager(&dbRepo)
+	accounting.JournalMgr = accounting.NewMySQLJournalManager(&dbRepo)
+	accounting.TransactionMgr = accounting.NewMySQLTransactionManager(&dbRepo)
+	accounting.ExchangeMgr = accounting.NewMySQLExchangeManager(&dbRepo)
 	accounting.UniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
 		Length:     16,
 		LowerAlpha: false,
@@ -81,7 +81,7 @@ func InitializeServer() error {
 	}
 
 	// setup health monitoring
-	err = health.InitializeHealthCheck(ctx, dbRepo.DB())
+	err = health.InitializeHealthCheck(ctx, &dbRepo)
 	if err != nil {
 		logf.Warn("health monitor error: ", err)
 	}
@@ -105,8 +105,7 @@ func InitializeServer() error {
 func shutdownServer() error {
 	logf := srvLog.WithField("fn", "shutdownServer")
 
-	// ctx := context.Background()
-	// sqxRepo.CloseConnection()
+	dbRepo.Disconnect()
 	logf.Info("done: db closed")
 
 	return nil
