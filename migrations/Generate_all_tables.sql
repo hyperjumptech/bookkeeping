@@ -1,6 +1,6 @@
 use wallet;
 
-CREATE TABLE accounts (
+CREATE TABLE IF NOT EXISTS accounts (
   `account_number` VARCHAR(20) NOT NULL,
   `name` VARCHAR(128) NOT NULL,
   `currency_code` VARCHAR(10) NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE accounts (
   INDEX(`coa`, `name`)
 );
 
-CREATE TABLE currencies (
+CREATE TABLE IF NOT EXISTS currencies (
   `code` VARCHAR(10) NOT NULL,
   `name` VARCHAR(30) NOT NULL,
   `exchange` FLOAT NOT NULL,
@@ -29,7 +29,7 @@ CREATE TABLE currencies (
   PRIMARY KEY (`code`)
 );
 
-CREATE TABLE journals (
+CREATE TABLE IF NOT EXISTS journals (
   `journal_id` VARCHAR(20) NOT NULL,
   `journaling_time` TIMESTAMP NOT NULL,
   `description` TEXT,
@@ -44,7 +44,7 @@ CREATE TABLE journals (
   PRIMARY KEY (`journal_id`)
 );
 
-CREATE TABLE transactions (
+CREATE TABLE IF NOT EXISTS transactions (
   `transaction_id` VARCHAR(20) NOT NULL,
   `account_number` VARCHAR(20) NOT NULL,
   `transaction_time` TIMESTAMP NOT NULL,

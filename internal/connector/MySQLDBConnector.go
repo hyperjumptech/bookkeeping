@@ -126,7 +126,7 @@ func (repo *MySQLDBRepository) InsertAccount(ctx context.Context, rec *AccountRe
 		rec.CreatedBy = rec.CreatedBy[:16]
 	}
 	if len(rec.UpdatedBy) > 16 {
-		rec.CreatedBy = rec.UpdatedBy[:16]
+		rec.UpdatedBy = rec.UpdatedBy[:16]
 	}
 
 	theUser, ok := ctx.Value(contextkeys.UserIDContextKey).(string)

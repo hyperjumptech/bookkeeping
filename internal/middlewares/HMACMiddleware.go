@@ -77,8 +77,7 @@ func ValidateHMAC(hmac string) bool {
 		return false
 	}
 	splt := strings.Split(string(decode), "$")
-	if len(splt) < 2 {
-		// invalid HMAC format
+	if len(splt) < 2 { // invalid HMAC format
 		return false
 	}
 	timeStr := splt[0]
