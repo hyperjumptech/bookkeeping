@@ -2,6 +2,7 @@ package health
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	gosundheit "github.com/AppsFlyer/go-sundheit"
@@ -26,6 +27,9 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 		return ctx.Err()
 	}
 
+	if !repo.IsConnected() {
+		return errors.New("Db not connected, healthcheck disabled")
+	}
 	// create a new health instance
 	H = gosundheit.New()
 
@@ -54,7 +58,7 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	}
 
 	// For checking database connections
-	dbCheck, err := checks.NewPingCheck("db.check", repo.DB())
+	dbCheck, err := checks.NewPingCheck("db.check", repo.DB().DB)
 	if err != nil {
 		logf.Error("could not setup dbCheck")
 	}
@@ -68,5 +72,4 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	}
 
 	return nil
-
 }

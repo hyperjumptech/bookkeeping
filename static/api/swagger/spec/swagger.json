@@ -16,7 +16,7 @@
   "servers": [
     {
       "description": "HTTP Localhost",
-      "url": "http://localhost:700"
+      "url": "http://localhost:7000"
     }
   ],
   "tags": [

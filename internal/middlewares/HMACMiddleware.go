@@ -77,6 +77,9 @@ func ValidateHMAC(hmac string) bool {
 		return false
 	}
 	splt := strings.Split(string(decode), "$")
+	if len(splt) < 2 { // invalid HMAC format
+		return false
+	}
 	timeStr := splt[0]
 	signature64 := splt[1]
 	timeToCheck, err := time.Parse(time.RFC3339, timeStr)
