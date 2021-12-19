@@ -8,11 +8,6 @@ import (
 
 	//Anonymous import for mysql initialization
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/sirupsen/logrus"
-)
-
-var (
-	log = logrus.WithField("module", "DBConnector")
 )
 
 // AccountRecord an entity representative of Account table

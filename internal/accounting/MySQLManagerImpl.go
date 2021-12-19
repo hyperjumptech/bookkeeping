@@ -228,9 +228,9 @@ func (jm *MySQLJournalManager) PersistJournal(ctx context.Context, journalToPers
 		}
 
 		if trx.GetAlignment() == acccore.DEBIT {
-			transactionToInsert.Alignment = "DEBIT"
+			transactionToInsert.Alignment = DEBIT
 		} else {
-			transactionToInsert.Alignment = "CREDIT"
+			transactionToInsert.Alignment = CREDIT
 		}
 
 		account, err := jm.repo.GetAccount(ctx, trx.GetAccountNumber())
@@ -375,7 +375,7 @@ func (jm *MySQLJournalManager) GetJournalByID(ctx context.Context, journalID str
 		transaction.SetJournalID(trx.JournalID).SetTransactionTime(trx.TransactionTime).
 			SetAccountNumber(trx.AccountNumber).SetTransactionID(trx.TransactionID).SetDescription(trx.Description).
 			SetCreateTime(trx.CreatedAt).SetCreateBy(trx.CreatedBy).SetAccountBalance(trx.Balance).SetAmount(trx.Amount)
-		if strings.ToUpper(trx.Alignment) == "DEBIT" {
+		if strings.ToUpper(trx.Alignment) == DEBIT {
 			transaction.SetAlignment(acccore.DEBIT)
 		} else {
 			transaction.SetAlignment(acccore.CREDIT)
@@ -421,7 +421,7 @@ func (jm *MySQLJournalManager) RenderJournal(ctx context.Context, journal acccor
 
 	var buff bytes.Buffer
 	table := tablewriter.NewWriter(&buff)
-	table.SetHeader([]string{"TRX ID", "Account", "Description", "DEBIT", "CREDIT"})
+	table.SetHeader([]string{"TRX ID", "Account", "Description", DEBIT, CREDIT})
 	table.SetFooter([]string{"", "", "", fmt.Sprintf("%d", acccore.GetTotalDebit(journal)), fmt.Sprintf("%d", acccore.GetTotalCredit(journal))})
 
 	for _, t := range journal.GetTransactions() {
@@ -493,7 +493,7 @@ func (am *MySQLTransactionManager) GetTransactionByID(ctx context.Context, id st
 		SetDescription(tx.Description).SetTransactionID(tx.TransactionID).SetAccountNumber(tx.AccountNumber).
 		SetTransactionTime(tx.TransactionTime).SetJournalID(tx.JournalID)
 
-	if strings.ToUpper(tx.Alignment) == "DEBIT" {
+	if strings.ToUpper(tx.Alignment) == DEBIT {
 		trx.SetAlignment(acccore.DEBIT)
 	} else {
 		trx.SetAlignment(acccore.CREDIT)
@@ -526,7 +526,7 @@ func (am *MySQLTransactionManager) ListTransactionsOnAccount(ctx context.Context
 			SetDescription(tx.Description).SetTransactionID(tx.TransactionID).SetAccountNumber(tx.AccountNumber).
 			SetTransactionTime(tx.TransactionTime).SetJournalID(tx.JournalID)
 
-		if strings.ToUpper(tx.Alignment) == "DEBIT" {
+		if strings.ToUpper(tx.Alignment) == DEBIT {
 			trx.SetAlignment(acccore.DEBIT)
 		} else {
 			trx.SetAlignment(acccore.CREDIT)
@@ -593,50 +593,50 @@ func (am *MySQLAccountManager) NewAccount(ctx context.Context) acccore.Account {
 
 // PersistAccount will save the account into database.
 // will throw error if the account already persisted
-func (am *MySQLAccountManager) PersistAccount(ctx context.Context, AccountToPersist acccore.Account) error {
+func (am *MySQLAccountManager) PersistAccount(ctx context.Context, accountToPersist acccore.Account) error {
 	requestID := ctx.Value(contextkeys.XRequestID).(string)
 	lLog := dbLog.WithField("RequestID", requestID).WithField("function", "PersistAccount")
 
-	if len(AccountToPersist.GetAccountNumber()) == 0 {
+	if len(accountToPersist.GetAccountNumber()) == 0 {
 		return acccore.ErrAccountMissingID
 	}
-	if len(AccountToPersist.GetName()) == 0 {
+	if len(accountToPersist.GetName()) == 0 {
 		return acccore.ErrAccountMissingName
 	}
-	if len(AccountToPersist.GetDescription()) == 0 {
+	if len(accountToPersist.GetDescription()) == 0 {
 		return acccore.ErrAccountMissingDescription
 	}
-	if len(AccountToPersist.GetCreateBy()) == 0 {
+	if len(accountToPersist.GetCreateBy()) == 0 {
 		return acccore.ErrAccountMissingCreator
 	}
 
-	curRec, err := am.repo.GetCurrency(ctx, AccountToPersist.GetCurrency())
+	curRec, err := am.repo.GetCurrency(ctx, accountToPersist.GetCurrency())
 	if err != nil {
 		lLog.Errorf("error while calling am.repo.GetCurrency. got %s", err.Error())
 		return err
 	}
 	if curRec == nil {
-		logrus.Errorf("can not persist. currency do not exist %s", AccountToPersist.GetCurrency())
+		logrus.Errorf("can not persist. currency do not exist %s", accountToPersist.GetCurrency())
 		return acccore.ErrCurrencyNotFound
 	}
 
 	ar := &connector.AccountRecord{
-		AccountNumber: AccountToPersist.GetAccountNumber(),
-		Name:          AccountToPersist.GetName(),
-		CurrencyCode:  AccountToPersist.GetCurrency(),
-		Description:   AccountToPersist.GetDescription(),
+		AccountNumber: accountToPersist.GetAccountNumber(),
+		Name:          accountToPersist.GetName(),
+		CurrencyCode:  accountToPersist.GetCurrency(),
+		Description:   accountToPersist.GetDescription(),
 		// Alignment:     AccountToPersist.GetBaseTransactionType(),
-		Balance:   AccountToPersist.GetBalance(),
-		Coa:       AccountToPersist.GetCOA(),
+		Balance:   accountToPersist.GetBalance(),
+		Coa:       accountToPersist.GetCOA(),
 		CreatedAt: time.Now(),
-		CreatedBy: AccountToPersist.GetCreateBy(),
+		CreatedBy: accountToPersist.GetCreateBy(),
 		UpdatedAt: time.Now(),
-		UpdatedBy: AccountToPersist.GetUpdateBy(),
+		UpdatedBy: accountToPersist.GetUpdateBy(),
 	}
-	if AccountToPersist.GetAlignment() == acccore.DEBIT {
-		ar.Alignment = "DEBIT"
+	if accountToPersist.GetAlignment() == acccore.DEBIT {
+		ar.Alignment = DEBIT
 	} else {
-		ar.Alignment = "CREDIT"
+		ar.Alignment = CREDIT
 	}
 
 	_, err = am.repo.InsertAccount(ctx, ar)
@@ -687,9 +687,9 @@ func (am *MySQLAccountManager) UpdateAccount(ctx context.Context, AccountToUpdat
 		UpdatedBy: AccountToUpdate.GetUpdateBy(),
 	}
 	if AccountToUpdate.GetAlignment() == acccore.DEBIT {
-		ar.Alignment = "DEBIT"
+		ar.Alignment = DEBIT
 	} else {
-		ar.Alignment = "CREDIT"
+		ar.Alignment = CREDIT
 	}
 
 	return am.repo.UpdateAccount(ctx, ar)
@@ -731,7 +731,7 @@ func (am *MySQLAccountManager) GetAccountByID(ctx context.Context, id string) (a
 		SetCreateBy(rec.CreatedBy).SetCurrency(rec.CurrencyCode).SetCOA(rec.Coa).SetName(rec.Name).
 		SetBalance(rec.Balance).SetUpdateBy(rec.UpdatedBy).SetUpdateTime(rec.UpdatedAt)
 
-	if strings.ToUpper(rec.Alignment) == "DEBIT" {
+	if strings.ToUpper(rec.Alignment) == DEBIT {
 		ret.SetAlignment(acccore.DEBIT)
 	} else {
 		ret.SetAlignment(acccore.CREDIT)
@@ -765,7 +765,7 @@ func (am *MySQLAccountManager) ListAccounts(ctx context.Context, request acccore
 			SetCreateBy(rec.CreatedBy).SetCurrency(rec.CurrencyCode).SetCOA(rec.Coa).SetName(rec.Name).
 			SetBalance(rec.Balance).SetUpdateBy(rec.UpdatedBy).SetUpdateTime(rec.UpdatedAt)
 
-		if strings.ToUpper(rec.Alignment) == "DEBIT" {
+		if strings.ToUpper(rec.Alignment) == DEBIT {
 			bacc.SetAlignment(acccore.DEBIT)
 		} else {
 			bacc.SetAlignment(acccore.CREDIT)
@@ -802,7 +802,7 @@ func (am *MySQLAccountManager) ListAccountByCOA(ctx context.Context, coa string,
 			SetCreateBy(rec.CreatedBy).SetCurrency(rec.CurrencyCode).SetCOA(rec.Coa).SetName(rec.Name).
 			SetBalance(rec.Balance).SetUpdateBy(rec.UpdatedBy).SetUpdateTime(rec.UpdatedAt)
 
-		if strings.ToUpper(rec.Alignment) == "DEBIT" {
+		if strings.ToUpper(rec.Alignment) == DEBIT {
 			bacc.SetAlignment(acccore.DEBIT)
 		} else {
 			bacc.SetAlignment(acccore.CREDIT)
@@ -838,7 +838,7 @@ func (am *MySQLAccountManager) FindAccounts(ctx context.Context, nameLike string
 			SetCreateBy(rec.CreatedBy).SetCurrency(rec.CurrencyCode).SetCOA(rec.Coa).SetName(rec.Name).
 			SetBalance(rec.Balance).SetUpdateBy(rec.UpdatedBy).SetUpdateTime(rec.UpdatedAt)
 
-		if strings.ToUpper(rec.Alignment) == "DEBIT" {
+		if strings.ToUpper(rec.Alignment) == DEBIT {
 			bacc.SetAlignment(acccore.DEBIT)
 		} else {
 			bacc.SetAlignment(acccore.CREDIT)

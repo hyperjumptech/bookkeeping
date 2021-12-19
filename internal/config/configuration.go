@@ -31,11 +31,11 @@ func LoadConfig() {
 
 	defCfg["server.host"] = "localhost"
 	defCfg["server.port"] = "7000"
-	defCfg["server.log.level"] = "debug" // valid values are trace, debug, info, warn, error, fatal
-	defCfg["server.timeout.write"] = "15 seconds"
-	defCfg["server.timeout.read"] = "15 seconds"
-	defCfg["server.timeout.idle"] = "60 seconds"
-	defCfg["server.timeout.graceshut"] = "15 seconds"
+	defCfg["server.log.level"] = "debug"      // valid values are trace, debug, info, warn, error, fatal
+	defCfg["server.timeout.write"] = "15"     // seconds
+	defCfg["server.timeout.read"] = "15"      // seconds
+	defCfg["server.timeout.idle"] = "60"      // seconds
+	defCfg["server.timeout.graceshut"] = "15" // seconds
 
 	defCfg["server.context.timeout"] = "30" // seconds
 

@@ -19,6 +19,13 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	// DEBIT is the debit alignment
+	DEBIT = "DEBIT"
+	// CREDIT is the credit alignment
+	CREDIT = "CREDIT"
+)
+
 var (
 	// AccountMgr is the account manager instance used in all rest endpoint
 	AccountMgr acccore.AccountManager
@@ -214,9 +221,9 @@ func GetAccount(w http.ResponseWriter, r *http.Request) {
 		Balance: account.GetBalance(),
 	}
 	if account.GetAlignment() == acccore.DEBIT {
-		ret.Alignment = "DEBIT"
+		ret.Alignment = DEBIT
 	} else {
-		ret.Alignment = "CREDIT"
+		ret.Alignment = CREDIT
 	}
 	helpers.HTTPResponseBuilder(r.Context(), w, r, 200, "account "+account.GetAccountNumber(), ret, 0)
 }
@@ -317,9 +324,9 @@ func ListTransactionByAccount(w http.ResponseWriter, r *http.Request) {
 
 	retTransac := make([]*TransactionListItem, len(transactions))
 	for idx, trx := range transactions {
-		align := "DEBIT"
+		align := DEBIT
 		if trx.GetAlignment() == acccore.CREDIT {
-			align = "CREDIT"
+			align = CREDIT
 		}
 		retTransac[idx] = &TransactionListItem{
 			TransactionID:   trx.GetTransactionID(),
@@ -495,9 +502,9 @@ func FindAccount(w http.ResponseWriter, r *http.Request) {
 			Balance: acc.GetBalance(),
 		}
 		if acc.GetAlignment() == acccore.DEBIT {
-			acci.Alignment = "DEBIT"
+			acci.Alignment = DEBIT
 		} else {
-			acci.Alignment = "CREDIT"
+			acci.Alignment = CREDIT
 		}
 		accountSet = append(accountSet, acci)
 	}
@@ -544,7 +551,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		SetCreateBy(newEnt.Creator).SetCreateTime(time.Now()).SetBalance(0).SetName(newEnt.Name).
 		SetCOA(newEnt.COA).SetCurrency(newEnt.Currency).SetDescription(newEnt.Description)
 
-	if strings.ToUpper(newEnt.Alignment) == "DEBIT" {
+	if strings.ToUpper(newEnt.Alignment) == DEBIT {
 		acc.SetAlignment(acccore.DEBIT)
 	} else {
 		acc.SetAlignment(acccore.CREDIT)
@@ -612,9 +619,9 @@ func GetJournal(w http.ResponseWriter, r *http.Request) {
 	}
 	retTrxes := make([]*TransactionListItem, len(j.GetTransactions()))
 	for idx, trx := range j.GetTransactions() {
-		align := "DEBIT"
+		align := DEBIT
 		if trx.GetAlignment() == acccore.CREDIT {
-			align = "CREDIT"
+			align = CREDIT
 		}
 		retTrxes[idx] = &TransactionListItem{
 			TransactionID:   trx.GetTransactionID(),
@@ -794,7 +801,7 @@ func CreateJournal(w http.ResponseWriter, r *http.Request) {
 			CreateTime:      time.Now(),
 			CreateBy:        reqBod.Creator,
 		}
-		if strings.ToUpper(tx.Alignment) == "DEBIT" {
+		if strings.ToUpper(tx.Alignment) == DEBIT {
 			ntx.TransactionType = acccore.DEBIT
 		} else {
 			ntx.TransactionType = acccore.CREDIT

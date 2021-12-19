@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/sirupsen/logrus"
 
 	"github.com/hyperjumptech/acccore"
 	"github.com/hyperjumptech/hyperwallet/errors"
@@ -16,7 +17,7 @@ import (
 )
 
 var (
-	mysqlLog = log.WithField("file", "MySQLDBConnector.go")
+	mysqlLog = logrus.WithField("file", "MySQLDBConnector.go")
 )
 
 // MySQLDBRepository is implementation of DBRepository specified for MySQL database

@@ -124,7 +124,9 @@ func StartServer() {
 		logf.Error(err)
 	}
 	defer func() {
-		_ = shutdownServer() // ignore errors, exiting anyway
+		if err := shutdownServer(); err != nil {
+			logf.Info("shutting down but got: ", err)
+		}
 	}()
 
 	logf.Info("starting server...")
@@ -151,7 +153,10 @@ func StartServer() {
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
-	_ = HTTPServer.Shutdown(ctx)
+	err = HTTPServer.Shutdown(ctx)
+	if err != nil {
+		logf.Error("shutting down but got: ", err)
+	}
 	// Optionally, you could run srv.Shutdown in a goroutine and block on
 	// <-ctx.Done() if your application should wait for other services
 	// to finalize based on context cancellation.
