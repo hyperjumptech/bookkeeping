@@ -6,7 +6,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	//Anonymous import for mysql initialization
+	// Anonymous import for mysql initialization
 	_ "github.com/go-sql-driver/mysql"
 )
 

@@ -21,9 +21,9 @@ import (
 
 const (
 	// DEBIT is the debit alignment
-	DEBIT = "DEBIT"
+	DEBIT string = "DEBIT"
 	// CREDIT is the credit alignment
-	CREDIT = "CREDIT"
+	CREDIT string = "CREDIT"
 )
 
 var (
