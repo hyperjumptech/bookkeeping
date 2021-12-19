@@ -129,12 +129,12 @@ func StaticServer(path string) func(w http.ResponseWriter, r *http.Request) {
 			fdata, err := static.GetFile(filePath)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				w.Write([]byte(err.Error()))
+				_, _ = w.Write([]byte(err.Error())) // explicitly ignoring int, err
 				return
 			}
 			w.Header().Set("Content-Type", fdata.ContentType)
 			w.WriteHeader(http.StatusOK)
-			w.Write(fdata.Bytes)
+			_, _ = w.Write(fdata.Bytes)
 			return
 		} else {
 			w.WriteHeader(http.StatusNotFound)

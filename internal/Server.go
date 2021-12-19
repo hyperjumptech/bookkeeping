@@ -26,8 +26,6 @@ var (
 
 	// StartUpTime records first ime up
 	startUpTime time.Time
-	// ServerVersion is a semver versioning
-	serverVersion string
 
 	// HTTPServer object
 	HTTPServer *http.Server
@@ -105,7 +103,10 @@ func InitializeServer() error {
 func shutdownServer() error {
 	logf := srvLog.WithField("fn", "shutdownServer")
 
-	dbRepo.Disconnect()
+	err := dbRepo.Disconnect()
+	if err != nil {
+		logf.Error("error closing db connection: ", err)
+	}
 	logf.Info("done: db closed")
 
 	return nil
@@ -122,7 +123,9 @@ func StartServer() {
 	if err != nil {
 		logf.Error(err)
 	}
-	defer shutdownServer()
+	defer func() {
+		_ = shutdownServer() // ignore errors, exiting anyway
+	}()
 
 	logf.Info("starting server...")
 	logf.Info("App version: ", config.Get("app.version"), ", listening at: ", address)
@@ -148,7 +151,7 @@ func StartServer() {
 	defer cancel()
 	// Doesn't block if no connections, but will otherwise wait
 	// until the timeout deadline.
-	HTTPServer.Shutdown(ctx)
+	_ = HTTPServer.Shutdown(ctx)
 	// Optionally, you could run srv.Shutdown in a goroutine and block on
 	// <-ctx.Done() if your application should wait for other services
 	// to finalize based on context cancellation.

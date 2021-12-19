@@ -174,7 +174,7 @@ func DrawAccount(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(str))
+	_, _ = w.Write([]byte(str)) // explicitly ignoreing int, err.. just write
 }
 
 // GetAccount is the controller to handle retrieval of single account
@@ -669,7 +669,7 @@ func DrawJournal(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Add("Content-Type", "text/plain")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(drawing))
+	_, _ = w.Write([]byte(drawing)) // ignoreing int, err.. just draw it!
 }
 
 // PaginatedJournalsResponse is the journal response paginated

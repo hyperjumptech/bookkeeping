@@ -101,19 +101,19 @@ func DevKey(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	gHMAC := GenHMAC()
 	if hocuspocus == "AvadaCadavra" {
-		w.Write([]byte(fmt.Sprintf("Looking for magical incantation.... Found\n")))
+		_, _ = w.Write([]byte("Looking for magical incantation.... Found\n")) // ignoring int, err here as no need to check
 		first := rand.Intn(4)
 		for i := 0; i < first; i++ {
-			w.Write([]byte(fmt.Sprintf("%s\n", MakeResidue(gHMAC))))
+			_, _ = w.Write([]byte(fmt.Sprintf("%s\n", MakeResidue(gHMAC)))) // living on the edge, not checking for err
 		}
-		w.Write([]byte(fmt.Sprintf("%s\n", gHMAC)))
+		_, _ = w.Write([]byte(fmt.Sprintf("%s\n", gHMAC)))
 		for i := 0; i < 4-first; i++ {
-			w.Write([]byte(fmt.Sprintf("%s\n", MakeResidue(gHMAC))))
+			_, _ = w.Write([]byte(fmt.Sprintf("%s\n", MakeResidue(gHMAC))))
 		}
 	} else if len(hocuspocus) > 0 {
-		w.Write([]byte(fmt.Sprintf("Looking for magical incantation.... Not Found : nothing happen")))
+		_, _ = w.Write([]byte("Looking for magical incantation.... Not Found : nothing happen"))
 	} else {
-		w.Write([]byte("not found"))
+		_, _ = w.Write([]byte("not found"))
 	}
 }
 
