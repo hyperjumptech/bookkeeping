@@ -158,7 +158,7 @@ func DrawAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	if account == nil {
 		llog.Errorf("error account number not found : %s", accountNo)
-		helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "backend error", err.Error(), 2)
+		helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "backend error", "account not found", 2)
 		return
 	}
 
