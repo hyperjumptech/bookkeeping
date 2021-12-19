@@ -124,7 +124,7 @@ func StartServer() {
 		logf.Error(err)
 	}
 	defer func() {
-		if err := shutdownServer(); err != nil {
+		if err = shutdownServer(); err != nil {
 			logf.Info("shutting down but got: ", err)
 		}
 	}()
@@ -133,7 +133,7 @@ func StartServer() {
 	logf.Info("App version: ", config.Get("app.version"), ", listening at: ", address)
 	// Run our server in a goroutine so that it doesn't block.
 	go func() {
-		if err := HTTPServer.ListenAndServe(); err != nil {
+		if err = HTTPServer.ListenAndServe(); err != nil {
 			logf.Error(err)
 		}
 	}()
