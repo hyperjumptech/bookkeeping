@@ -35,6 +35,7 @@ COPY --from=builder /etc/group /etc/group
 COPY --from=builder /build/wallet-go-img /app/
 WORKDIR /app
 
+RUN chown -R appuser:appuser /app/
 # Use an unprivileged user.
 USER appuser:appuser
 EXPOSE 7000
