@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hyperjumptech/hyperwallet/static/mime"
+	"github.com/hyperjumptech/bookkeeping/static/mime"
 	"github.com/sirupsen/logrus"
 )
 
