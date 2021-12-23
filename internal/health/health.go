@@ -7,8 +7,8 @@ import (
 
 	gosundheit "github.com/AppsFlyer/go-sundheit"
 	"github.com/AppsFlyer/go-sundheit/checks"
-	"github.com/hyperjumptech/hyperwallet/internal/config"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
+	"github.com/hyperjumptech/bookkeeping/internal/config"
+	"github.com/hyperjumptech/bookkeeping/internal/connector"
 	log "github.com/sirupsen/logrus"
 )
 

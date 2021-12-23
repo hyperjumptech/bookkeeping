@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
-	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/hyperjumptech/bookkeeping/internal/connector"
+	"github.com/hyperjumptech/bookkeeping/internal/contextkeys"
 	"github.com/olekukonko/tablewriter"
 	"github.com/sirupsen/logrus"
 )

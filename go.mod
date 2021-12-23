@@ -1,4 +1,4 @@
-module github.com/hyperjumptech/hyperwallet
+module github.com/hyperjumptech/bookkeeping
 
 go 1.17
 
