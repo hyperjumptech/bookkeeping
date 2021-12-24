@@ -10,14 +10,14 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/internal/accounting"
+	"github.com/hyperjumptech/bookkeeping/internal/accounting"
 
 	"github.com/gorilla/mux"
-	"github.com/hyperjumptech/hyperwallet/internal/config"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
-	"github.com/hyperjumptech/hyperwallet/internal/health"
-	"github.com/hyperjumptech/hyperwallet/internal/logger"
-	"github.com/hyperjumptech/hyperwallet/internal/router"
+	"github.com/hyperjumptech/bookkeeping/internal/config"
+	"github.com/hyperjumptech/bookkeeping/internal/connector"
+	"github.com/hyperjumptech/bookkeeping/internal/health"
+	"github.com/hyperjumptech/bookkeeping/internal/logger"
+	"github.com/hyperjumptech/bookkeeping/internal/router"
 	log "github.com/sirupsen/logrus"
 )
 

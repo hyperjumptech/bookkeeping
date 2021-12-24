@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/hyperjumptech/hyperwallet/internal/accounting"
-	"github.com/hyperjumptech/hyperwallet/internal/middlewares"
-	"github.com/hyperjumptech/hyperwallet/static"
+	"github.com/hyperjumptech/bookkeeping/internal/accounting"
+	"github.com/hyperjumptech/bookkeeping/internal/middlewares"
+	"github.com/hyperjumptech/bookkeeping/static"
 
 	healthhttp "github.com/AppsFlyer/go-sundheit/http"
 	"github.com/gorilla/mux"
-	"github.com/hyperjumptech/hyperwallet/internal/health"
+	"github.com/hyperjumptech/bookkeeping/internal/health"
 	log "github.com/sirupsen/logrus"
 )
 

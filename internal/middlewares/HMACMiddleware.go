@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/hyperjumptech/hyperwallet/internal/config"
+	"github.com/hyperjumptech/bookkeeping/internal/config"
 )
 
 var (

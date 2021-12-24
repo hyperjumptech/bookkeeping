@@ -14,10 +14,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/internal/config"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
-	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
-	"github.com/hyperjumptech/hyperwallet/internal/middlewares"
+	"github.com/hyperjumptech/bookkeeping/internal/config"
+	"github.com/hyperjumptech/bookkeeping/internal/connector"
+	"github.com/hyperjumptech/bookkeeping/internal/contextkeys"
+	"github.com/hyperjumptech/bookkeeping/internal/middlewares"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )

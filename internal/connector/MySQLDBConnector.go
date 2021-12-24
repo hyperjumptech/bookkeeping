@@ -7,12 +7,12 @@ import (
 	"html"
 	"time"
 
-	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/hyperjumptech/bookkeeping/internal/contextkeys"
 	"github.com/sirupsen/logrus"
 
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/errors"
-	"github.com/hyperjumptech/hyperwallet/internal/config"
+	"github.com/hyperjumptech/bookkeeping/errors"
+	"github.com/hyperjumptech/bookkeeping/internal/config"
 	"github.com/jmoiron/sqlx"
 )
 

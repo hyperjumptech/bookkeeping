@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/hyperjumptech/hyperwallet/internal"
+	"github.com/hyperjumptech/bookkeeping/internal"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,7 +26,7 @@ var (
 
 
 	(c)2021 hyperjumptech wallet service
-	https://github.com/hyperjumptech/hyperwallet/README.md  
+	https://github.com/hyperjumptech/bookkeeping/README.md  
 	
 	`
 )

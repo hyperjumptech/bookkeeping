@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
-	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/hyperjumptech/bookkeeping/internal/connector"
+	"github.com/hyperjumptech/bookkeeping/internal/contextkeys"
 	"github.com/olekukonko/tablewriter"
 	"github.com/sirupsen/logrus"
 )
@@ -314,8 +314,11 @@ func (jm *MySQLJournalManager) IsJournalIDReversed(ctx context.Context, journalI
 	// return false if COUNT = 0
 	// return true if COUNT > 0
 	journal, err := jm.repo.GetJournalByReversalID(ctx, journalID)
-	if err != nil || journal == nil {
+	if err != nil {
 		lLog.Errorf("error while calling GetJournalByReversalID. got %s", err.Error())
+		return false, nil
+	}
+	if journal == nil { // journal == nil AND err == nil, then journal is not reversed
 		return false, nil
 	}
 	return true, nil
@@ -346,8 +349,8 @@ func (jm *MySQLJournalManager) GetJournalByID(ctx context.Context, journalID str
 		return nil, err
 	}
 	if journal == nil {
-		lLog.Errorf("error while calling GetJournal, journal is NIL but not throw any error.")
-		return nil, fmt.Errorf("error while calling GetJournal, journal is NIL but not throw any error")
+		lLog.Errorf("error while calling GetJournal, journal is NIL but not throwing any error.")
+		return nil, fmt.Errorf("error while calling GetJournal, journal is NIL but not throwing any error")
 	}
 	ret := &acccore.BaseJournal{}
 	ret.SetAmount(journal.TotalAmount).SetDescription(journal.Description).SetReversal(journal.IsReversal).

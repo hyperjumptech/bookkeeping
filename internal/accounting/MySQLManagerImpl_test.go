@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/internal/config"
-	"github.com/hyperjumptech/hyperwallet/internal/connector"
-	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
+	"github.com/hyperjumptech/bookkeeping/internal/config"
+	"github.com/hyperjumptech/bookkeeping/internal/connector"
+	"github.com/hyperjumptech/bookkeeping/internal/contextkeys"
 )
 
 func TestAccounting_CreateNewAccount(t *testing.T) {
