@@ -14,8 +14,8 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/acccore"
-	"github.com/hyperjumptech/hyperwallet/internal/contextkeys"
-	"github.com/hyperjumptech/hyperwallet/internal/helpers"
+	"github.com/hyperjumptech/bookkeeping/internal/contextkeys"
+	"github.com/hyperjumptech/bookkeeping/internal/helpers"
 	"github.com/sirupsen/logrus"
 )
 
@@ -158,7 +158,7 @@ func DrawAccount(w http.ResponseWriter, r *http.Request) {
 	}
 	if account == nil {
 		llog.Errorf("error account number not found : %s", accountNo)
-		helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "backend error", err.Error(), 2)
+		helpers.HTTPResponseBuilder(r.Context(), w, r, 404, "backend error", "account not found", 2)
 		return
 	}
 
@@ -885,8 +885,9 @@ func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	journal.SetTransactions(transacs)
+	journalContext := context.WithValue(r.Context(), contextkeys.UserIDContextKey, rBody.Creator)
 
-	err = JournalMgr.PersistJournal(r.Context(), journal)
+	err = JournalMgr.PersistJournal(journalContext, journal)
 	if err != nil {
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "internal server error when reversing journal", err.Error(), 0)
 		return

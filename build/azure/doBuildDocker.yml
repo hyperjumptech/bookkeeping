@@ -11,7 +11,7 @@ parameters:
     default: 'dockerHub'
   - name: dockerRepository
     type: string
-    default: 'hyperjump/hyperwallet-go-img'    
+    default: 'hyperjump/bookkeeping-go-img'    
   - name: dockerCommand
     type: string
     default: 'build'

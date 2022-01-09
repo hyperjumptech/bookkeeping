@@ -1,6 +1,6 @@
-# Hyperjump Wallet Service
+# Hyperjump Bookkeeping
 
-Hyperwallet is a generic bookkeeping and journaling management service. It implements the [acccore](https://github.com/hyperjumptech/acccore) accounting library. The service is intended for any applications where double-entry book keeping is required.
+Bookkeeping is a generic double entry book keeping and journaling management service. It implements the [acccore](https://github.com/hyperjumptech/acccore) accounting library. The service is intended for any applications where double-entry bookkeeping is required, such as walletsand loyalty programs.
 
 ## building  
 
@@ -70,7 +70,7 @@ User need to know the `SecretKey` used to generate the HMAC API Key.
 │   ├── dashboard  
 │   └── mime  
 
-## Further information see:  
+## Further information see
 
 1. [Golang Project Structure](https://tutorialedge.net/golang/go-project-structure-best-practices)  
-2. [Golang standard project layout ](https://github.com/golang-standards/project-layout)  
+2. [Golang standard project layout](https://github.com/golang-standards/project-layout)  
