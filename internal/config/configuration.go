@@ -26,7 +26,7 @@ func LoadConfig() {
 	viper.AutomaticEnv()
 
 	defCfg["app.id"] = "wallet-go-img"
-	defCfg["app.version"] = "1.0.0"
+	defCfg["app.version"] = "1.0.1"
 	defCfg["app.env"] = "development" // set to production
 
 	defCfg["server.host"] = "localhost"

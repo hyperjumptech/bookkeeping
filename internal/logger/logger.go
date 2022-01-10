@@ -46,7 +46,7 @@ func ConfigureLogging() {
 	})
 
 	if err != nil {
-		log.Fatalf("Failed to initialize file rotate hook: %v", err)
+		log.Error("Failed to initialize file rotate hook: %v", err)
 	}
 	log.SetFormatter(&log.JSONFormatter{
 		TimestampFormat: time.RFC3339,
