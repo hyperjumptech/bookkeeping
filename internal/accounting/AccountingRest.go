@@ -876,8 +876,8 @@ func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
 			JournalID:       journal.JournalID,
 			Description:     fmt.Sprintf("%s - reversed", txinfo.GetDescription()),
 			TransactionType: tx,
-			Amount:          0,
-			AccountBalance:  0,
+			Amount:          txinfo.GetAmount(),
+			AccountBalance:  txinfo.GetAccountBalance(),
 			CreateTime:      time.Now(),
 			CreateBy:        rBody.Creator,
 		}
