@@ -1,5 +1,5 @@
 FROM golang:1.17-alpine as builder
-LABEL maintainer="https://github.com/hyperjumptech/hyper-wallet"
+LABEL maintainer="https://github.com/hyperjumptech/bookkeeping"
 
 ENV CGO_ENABLED=0 \
     GOOS=linux \
@@ -22,7 +22,7 @@ RUN adduser \
 
 COPY . .
 RUN go mod tidy
-RUN go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o wallet-go-img cmd/Main.go
+RUN go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o bookkeeping-go-img cmd/Main.go
 
 
 #############################
@@ -32,11 +32,11 @@ FROM scratch
 COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 
-COPY --from=builder /build/wallet-go-img /app/
+COPY --from=builder /build/bookkeeping-go-img /app/
 WORKDIR /app
 
 # Use an unprivileged user.
 USER appuser:appuser
 EXPOSE 7000
 
-CMD ["/app/wallet-go-img"]
+CMD ["/app/bookkeeping-go-img"]
