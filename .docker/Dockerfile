@@ -1,4 +1,4 @@
-FROM golang:1.17-alpine as builder
+FROM golang:1.22-alpine as builder
 LABEL maintainer="https://github.com/hyperjumptech/bookkeeping"
 
 ENV CGO_ENABLED=0 \
