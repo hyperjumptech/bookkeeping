@@ -19,6 +19,7 @@ require (
 
 require (
 	firebase.google.com/go v3.13.0+incompatible
+	github.com/JamesStewy/go-mysqldump v0.2.2
 	github.com/mattn/go-colorable v0.1.13
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/snowzach/rotatefilehook v0.0.0-20180327172521-2f64f265f58c
@@ -29,7 +30,7 @@ require (
 	cloud.google.com/go v0.81.0 // indirect
 	cloud.google.com/go/firestore v1.1.0 // indirect
 	cloud.google.com/go/storage v1.10.0 // indirect
-	github.com/JamesStewy/go-mysqldump v0.2.2 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e // indirect
