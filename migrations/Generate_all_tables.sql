@@ -1,4 +1,4 @@
-use wallet;
+use bookkeeping;
 
 CREATE TABLE IF NOT EXISTS accounts (
   `account_number` VARCHAR(20) NOT NULL,

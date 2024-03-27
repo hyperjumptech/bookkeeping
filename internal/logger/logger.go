@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/hyperjumptech/bookkeeping/internal/config"
+	"github.com/mattn/go-colorable"
 	log "github.com/sirupsen/logrus"
 	"github.com/snowzach/rotatefilehook"
 )
@@ -12,7 +13,6 @@ import (
 // ConfigureLogging set logging lever from config
 func ConfigureLogging() {
 	lLevel := config.Get("server.log.level")
-	log.SetFormatter(&log.JSONFormatter{})
 	log.Info("Setting log level to: ", lLevel)
 	switch strings.ToUpper(lLevel) {
 	default:
@@ -35,7 +35,7 @@ func ConfigureLogging() {
 	currentTime := time.Now()
 
 	rotateFileHook, err := rotatefilehook.NewRotateFileHook(rotatefilehook.RotateFileConfig{
-		Filename:   "bookkeeping-" + currentTime.Format("2006-01-02") + ".log",
+		Filename:   "logs/bookkeeping-" + currentTime.Format("2006-01-02") + ".log",
 		MaxSize:    50, // megabytes
 		MaxBackups: 3,
 		MaxAge:     7, //days
@@ -48,6 +48,7 @@ func ConfigureLogging() {
 	if err != nil {
 		log.Error("Failed to initialize file rotate hook: ", err)
 	}
+	log.SetOutput(colorable.NewColorableStdout())
 	log.SetFormatter(&log.JSONFormatter{
 		TimestampFormat: time.RFC3339,
 		PrettyPrint:     false,

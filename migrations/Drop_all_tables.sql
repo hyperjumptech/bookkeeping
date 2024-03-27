@@ -1,4 +1,4 @@
-use wallet;
+use bookkeeping;
 
 DROP TABLE accounts;
 DROP TABLE currencies;

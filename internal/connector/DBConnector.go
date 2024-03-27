@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/sirupsen/logrus"
 
 	//Anonymous import for mysql initialization
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -108,7 +108,7 @@ type DBRepository interface {
 	// Connect connect there repository to the database, it uses the configuration internally for connection arguments and parameters.
 	Connect(ctx context.Context) error
 
-	// Disconnect the already establshed connection. Throws error if the underlying database connection yield an error
+	// Disconnect the already established connection. Throws error if the underlying database connection yield an error
 	Disconnect() error
 
 	// IsConnected check if the connection is already established
@@ -116,6 +116,9 @@ type DBRepository interface {
 
 	// DB the database connection object.
 	DB() *sqlx.DB
+
+	// Dump database for backup
+	DumpDB(ctx context.Context) (string, error)
 
 	// ClearTables clear all table for testing purpose
 	ClearTables(ctx context.Context) error

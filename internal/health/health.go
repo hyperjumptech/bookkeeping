@@ -28,7 +28,7 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	}
 
 	if !repo.IsConnected() {
-		return errors.New("Db not connected, healthcheck disabled")
+		return errors.New("db not connected, healthcheck disabled")
 	}
 	// create a new health instance
 	H = gosundheit.New()
@@ -47,6 +47,7 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	httpCheck, err := checks.NewHTTPCheck(httpCheckConf)
 	if err != nil {
 		logf.Error("could not setup httpCheck")
+		return err
 	}
 	err = H.RegisterCheck(
 		httpCheck,
@@ -55,10 +56,11 @@ func InitializeHealthCheck(ctx context.Context, repo *connector.MySQLDBRepositor
 	)
 	if err != nil {
 		logf.Error("Failed to register check(s): ", err)
+		return err
 	}
 
 	// For checking database connections
-	dbCheck, err := checks.NewPingCheck("db.check", repo.DB().DB)
+	dbCheck, err := checks.NewPingCheck("db.check", repo.DB())
 	if err != nil {
 		logf.Error("could not setup dbCheck")
 	}

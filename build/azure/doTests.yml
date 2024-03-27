@@ -12,23 +12,22 @@ steps:
     - script: |
         set -ex      
         go version
-        go get github.com/jstemmer/go-junit-report
-        go get github.com/axw/gocov/gocov
-        go get github.com/AlekSi/gocov-xml
-        go get golang.org/x/lint/golint
-        go get github.com/t-yuki/gocover-cobertura
-        go install github.com/newm4n/goornogo
+        go install github.com/jstemmer/go-junit-report/v2@latest
+        go install github.com/axw/gocov/gocov@latest
+        go install github.com/AlekSi/gocov-xml@latest
+        go install honnef.co/go/tools/cmd/staticcheck@latest
+        go install github.com/t-yuki/gocover-cobertura@latest
         sudo timedatectl set-timezone Asia/Jakarta
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       displayName: 'Fetch dependencies'
 
     - script: |
-            set -ex
-            /home/vsts/go/bin/golint -set_exit_status ${{ parameters.testPath }}
-            go test ./... -cover -vet -all -v -short -covermode=count -coverprofile=coverage.out > test_results.txt
+            set -ex   
+            /home/vsts/go/bin/staticcheck -version                     
+            /home/vsts/go/bin/staticcheck ${{ parameters.testPath }}
+            go test ./... -cover -v -short -covermode=count -coverprofile=coverage.out > test_results.txt
             /home/vsts/go/bin/go-junit-report < test_results.txt > report.xml
             /home/vsts/go/bin/gocover-cobertura < coverage.out > coverage.xml
-            /home/vsts/go/bin/goornogo -c 30 -i coverage.out
       workingDirectory: '$(System.DefaultWorkingDirectory)'
       displayName: 'Run unit test'
 

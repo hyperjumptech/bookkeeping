@@ -11,6 +11,8 @@ import (
 
 	"github.com/hyperjumptech/acccore"
 	"github.com/hyperjumptech/bookkeeping/internal/accounting"
+	"github.com/hyperjumptech/bookkeeping/internal/firebase"
+	"github.com/robfig/cron/v3"
 
 	"github.com/gorilla/mux"
 	"github.com/hyperjumptech/bookkeeping/internal/config"
@@ -27,7 +29,7 @@ var (
 	// StartUpTime records first ime up
 	startUpTime time.Time
 	// ServerVersion is a semver versioning
-	serverVersion string
+	// serverVersion string
 
 	// HTTPServer object
 	HTTPServer *http.Server
@@ -39,19 +41,21 @@ var (
 	address string
 
 	// dbRepo database repository
-	dbRepo connector.MySQLDBRepository
+	dbRepo connector.DBRepository
+
+	// cron timer
+	cr *cron.Cron
 )
 
 // InitializeServer initializes all server connections
 func InitializeServer() error {
 	logf := srvLog.WithField("fn", "InitializeServer")
 
-	// configure logging
-	logger.ConfigureLogging()
-
-	startUpTime = time.Now()
 	// load system / env configs
 	config.LoadConfig()
+	// configure logging
+	logger.ConfigureLogging()
+	startUpTime = time.Now()
 
 	t := time.Duration(config.GetInt("server.context.timeout"))
 	ctx, cancel := context.WithTimeout(context.Background(), t*time.Second)
@@ -62,17 +66,17 @@ func InitializeServer() error {
 	appRouter.Router = mux.NewRouter()
 
 	// setup db connection
-	dbRepo = connector.MySQLDBRepository{}
+	dbRepo = &connector.MySQLDBRepository{}
 	err := dbRepo.Connect(ctx)
 	if err != nil {
 		logf.Fatal("could not connect to db. Error: ", err)
 		panic("DB connection failed. please check log.")
 	}
 
-	accounting.AccountMgr = accounting.NewMySQLAccountManager(&dbRepo)
-	accounting.JournalMgr = accounting.NewMySQLJournalManager(&dbRepo)
-	accounting.TransactionMgr = accounting.NewMySQLTransactionManager(&dbRepo)
-	accounting.ExchangeMgr = accounting.NewMySQLExchangeManager(&dbRepo)
+	accounting.AccountMgr = accounting.NewMySQLAccountManager(dbRepo)
+	accounting.JournalMgr = accounting.NewMySQLJournalManager(dbRepo)
+	accounting.TransactionMgr = accounting.NewMySQLTransactionManager(dbRepo)
+	accounting.ExchangeMgr = accounting.NewMySQLExchangeManager(dbRepo)
 	accounting.UniqueIDGenerator = &acccore.RandomGenUniqueIDGenerator{
 		Length:     16,
 		LowerAlpha: false,
@@ -81,7 +85,7 @@ func InitializeServer() error {
 	}
 
 	// setup health monitoring
-	err = health.InitializeHealthCheck(ctx, &dbRepo)
+	err = health.InitializeHealthCheck(ctx, dbRepo.(*connector.MySQLDBRepository))
 	if err != nil {
 		logf.Warn("health monitor error: ", err)
 	}
@@ -98,6 +102,21 @@ func InitializeServer() error {
 		Handler:      appRouter.Router, // Pass our instance of gorilla/mux in.
 	}
 
+	// cron scheduler setup
+	cr = cron.New()
+	fmt.Println("schedule is: ", config.Get("cron.backup.daily"))
+	cr.AddFunc(config.Get("cron.backup.daily"), func() { cronBackupUpload(context.Background()) })
+	cr.Start()
+
+	// indicate if dev or production mode
+	env := config.Get("app.env")
+
+	if env == "production" {
+		logf.Info("environment is: ", env)
+	} else {
+		logf.Warn("environment is: ", env)
+	}
+
 	return nil
 }
 
@@ -105,9 +124,40 @@ func InitializeServer() error {
 func shutdownServer() error {
 	logf := srvLog.WithField("fn", "shutdownServer")
 
-	dbRepo.Disconnect()
+	dbRepo.DB().DB.Close()
 	logf.Info("done: db closed")
 
+	cr.Stop()
+	logf.Info("done: cron stopped")
+
+	return nil
+}
+
+// cronBackupUpload() runs periodically to dump db and upload to storage backup
+func cronBackupUpload(ctx context.Context) error {
+	logf := srvLog.WithField("fn", "cronBackupUpload")
+
+	file, err := dbRepo.DumpDB(ctx)
+	if err != nil {
+		logf.Error("failed to dump db to file, got: ", err)
+		if err = os.Remove(file); err != nil {
+			logf.Error("coudn't remove file, got: ", err)
+		}
+		return err
+	}
+	if err = firebase.Upload(ctx, file); err != nil {
+		logf.Error("failed to upload file, got: ", err)
+		if err = os.Remove(file); err != nil {
+			logf.Error("coudn't remove file, got: ", err)
+		}
+		return err
+	}
+	if err = os.Remove(file); err != nil {
+		logf.Error("coudn't remove file, got: ", err)
+		return err
+	}
+
+	logf.Info("success cleaning up: ", file)
 	return nil
 }
 

@@ -1,7 +1,7 @@
-# hyper-wallet makefile
+# bookkeeping makefile
 
 CURRENT_PATH ?= $(shell pwd)
-IMAGE_NAME ?= wallet-go-img
+IMAGE_NAME ?= bookkeeping-go-img
 
 .PHONY: all test clean build docker
 
@@ -14,7 +14,8 @@ clean:
 	rm -f $(IMAGE_NAME)
 
 lint: build
-	golint -set_exit_status ./...
+	go install honnef.co/go/tools/cmd/staticcheck@latest
+	staticcheck -f stylish ./...
 
 test-short: lint
 	go test ./... -v -covermode=count -coverprofile=coverage.out -short

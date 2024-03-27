@@ -289,4 +289,11 @@ $RECYCLE.BIN/
 ### ignore images
 *-go-img
 
+### logs
+bookkeeping*.log
+logs/
+
 # End of https://www.toptal.com/developers/gitignore/api/go,visualstudiocode,git
+
+.env
+mariadb/
