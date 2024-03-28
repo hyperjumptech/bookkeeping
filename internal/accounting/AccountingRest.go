@@ -6,7 +6,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
+
 	"math/big"
 	"net/http"
 	"strconv"
@@ -522,7 +523,7 @@ func CreateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyByte, err := ioutil.ReadAll(r.Body)
+	bodyByte, err := io.ReadAll(r.Body)
 	if err != nil {
 		llog.Errorf("got %s", err.Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "error reading body", err.Error(), 0)
@@ -759,7 +760,7 @@ func CreateJournal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	reqBod := &CreateJournalRequest{}
-	bodBytes, err := ioutil.ReadAll(r.Body)
+	bodBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "internal server error when reading body", err.Error(), 0)
 		return
@@ -823,7 +824,7 @@ func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	byteBody, err := ioutil.ReadAll(r.Body)
+	byteBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "internal server error when reading body", err.Error(), 0)
 		return
@@ -877,7 +878,7 @@ func CreateReversalJournal(w http.ResponseWriter, r *http.Request) {
 			Description:     fmt.Sprintf("%s - reversed", txinfo.GetDescription()),
 			TransactionType: tx,
 			Amount:          txinfo.GetAmount(),
-			AccountBalance:  txinfo.GetAccountBalance(),
+			AccountBalance:  txinfo.GetAmount(),
 			CreateTime:      time.Now(),
 			CreateBy:        rBody.Creator,
 		}
@@ -981,7 +982,7 @@ func SetCurrency(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bodyByte, err := ioutil.ReadAll(r.Body)
+	bodyByte, err := io.ReadAll(r.Body)
 	if err != nil {
 		llog.Errorf("error while reading body. got : %s", err.Error())
 		helpers.HTTPResponseBuilder(r.Context(), w, r, 500, "internal server error", err.Error(), 1)

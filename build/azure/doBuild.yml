@@ -5,7 +5,7 @@
 parameters:
   - name: imageName
     type: string
-    default: 'wallet-go-img'
+    default: 'bookkeeping-go-img'
   - name: path
     type: string
     default: './...'

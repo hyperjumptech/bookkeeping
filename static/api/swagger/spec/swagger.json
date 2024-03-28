@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "description": "This is the API documentation for a generic wallet service with double bookkeeping.  You can find\nout more about Swagger at\n[http://swagger.io](http://swagger.io) or on\n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n",
+    "description": "This is the double bookkeeping service swagger api documentation.  You can find\nout more about Swagger at\n[http://swagger.io](http://swagger.io) or on\n[irc.freenode.net, #swagger](http://swagger.io/irc/).\n",
     "version": "1.0.0",
     "title": "bookkeeping",
     "termsOfService": "http://swagger.io/terms/",

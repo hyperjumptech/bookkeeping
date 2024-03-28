@@ -1,4 +1,4 @@
-use wallet;
+use bookkeeping;
 
 DELETE FROM accounts;
 DELETE FROM currencies;

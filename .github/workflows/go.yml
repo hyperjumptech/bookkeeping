@@ -31,4 +31,4 @@ jobs:
       run: go build -v cmd/Main.go
 
     - name: Build docker
-      run: docker build . --file .docker/Dockerfile -t wallet-go-img:$(date +%s)
+      run: docker build . --file .docker/Dockerfile -t bookkeeping-go-img:$(date +%s)
