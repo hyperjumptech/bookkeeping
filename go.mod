@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/AppsFlyer/go-sundheit v0.4.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/hyperjumptech/acccore v1.0.4
 	github.com/jmoiron/sqlx v1.3.4
 	github.com/mattn/go-runewidth v0.0.13 // indirect
