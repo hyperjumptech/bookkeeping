@@ -5,9 +5,9 @@ go 1.22
 require (
 	github.com/AppsFlyer/go-sundheit v0.4.0
 	github.com/go-sql-driver/mysql v1.6.0
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/hyperjumptech/acccore v1.0.4
-	github.com/jmoiron/sqlx v1.3.4
+	github.com/jmoiron/sqlx v1.3.5
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/rs/cors v1.8.0
@@ -66,7 +66,7 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
