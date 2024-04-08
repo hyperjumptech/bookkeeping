@@ -1,6 +1,6 @@
 module github.com/hyperjumptech/bookkeeping
 
-go 1.22
+go 1.22.1
 
 require (
 	github.com/AppsFlyer/go-sundheit v0.4.0

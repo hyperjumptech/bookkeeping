@@ -34,6 +34,7 @@ jobs:
       #   languages: go, javascript, csharp, python, cpp, java
       with:
         languages: go
+        build-mode: autobuild
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
@@ -47,7 +48,7 @@ jobs:
     #    and modify them (or add more) to build your code if your project
     #    uses a compiled language
 
-    #- run: |
+      #- run: |
     #   make bootstrap
     #   make release
 
